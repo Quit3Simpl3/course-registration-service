@@ -1,6 +1,3 @@
-
-
-
 /**
  * Passive object representing the Database where all courses and users are stored.
  * <p>
@@ -10,9 +7,11 @@
  * You can add private fields and methods to this class as you see fit.
  */
 public class Database {
+	private final static class SingletonHolder {
+		private final static Database instance = new Database();
+	}
 
-
-	//to prevent user from creating new Database
+	// To prevent user from creating new Database
 	private Database() {
 		// TODO: implement
 	}
@@ -21,7 +20,7 @@ public class Database {
 	 * Retrieves the single instance of this class.
 	 */
 	public static Database getInstance() {
-		return singleton;
+		return SingletonHolder.instance;
 	}
 	
 	/**
@@ -32,6 +31,4 @@ public class Database {
 		// TODO: implement
 		return false;
 	}
-
-
 }
