@@ -38,7 +38,8 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         boolean success = false;
         try {
             success = chan.read(buf) != -1;
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
 
@@ -56,7 +57,8 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                             }
                         }
                     }
-                } finally {
+                }
+                finally {
                     releaseBuffer(buf);
                 }
             };
@@ -65,13 +67,13 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
             close();
             return null;
         }
-
     }
 
     public void close() {
         try {
             chan.close();
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -87,10 +89,12 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                 chan.write(top);
                 if (top.hasRemaining()) {
                     return;
-                } else {
+                }
+                else {
                     writeQueue.remove();
                 }
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 ex.printStackTrace();
                 close();
             }
@@ -115,5 +119,4 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private static void releaseBuffer(ByteBuffer buff) {
         BUFFER_POOL.add(buff);
     }
-
 }

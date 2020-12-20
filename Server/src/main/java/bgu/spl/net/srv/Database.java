@@ -1,3 +1,5 @@
+package bgu.spl.net.srv;
+
 /**
  * Passive object representing the Database where all courses and users are stored.
  * <p>
@@ -7,6 +9,10 @@
  * You can add private fields and methods to this class as you see fit.
  */
 public class Database {
+	// private fields:
+	// TODO: users hashtable
+	// TODO: HashMap<int courseNumber, Course course>
+
 	private final static class SingletonHolder {
 		private final static Database instance = new Database();
 	}
@@ -15,7 +21,7 @@ public class Database {
 	private Database() {
 		// TODO: implement
 		// 1. Read Courses.txt file
-		// 2. Parse into 
+		// 2. Parse into
 	}
 
 	/**

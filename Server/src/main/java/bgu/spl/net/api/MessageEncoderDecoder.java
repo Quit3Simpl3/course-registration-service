@@ -1,7 +1,6 @@
 package bgu.spl.net.api;
 
 public interface MessageEncoderDecoder<T> {
-
     /**
      * add the next byte to the decoding process
      *
@@ -18,5 +17,4 @@ public interface MessageEncoderDecoder<T> {
      * @return the encoded bytes
      */
     byte[] encode(T message);
-
 }
