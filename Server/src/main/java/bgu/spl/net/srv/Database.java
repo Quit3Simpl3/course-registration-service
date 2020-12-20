@@ -1,5 +1,7 @@
 package bgu.spl.net.srv;
 
+import java.util.List;
+
 /**
  * Passive object representing the Database where all courses and users are stored.
  * <p>
@@ -12,6 +14,7 @@ public class Database {
 	// private fields:
 	// TODO: users hashtable
 	// TODO: HashMap<int courseNumber, Course course>
+	// Courses Class: List<Course>
 
 	private final static class SingletonHolder {
 		private final static Database instance = new Database();

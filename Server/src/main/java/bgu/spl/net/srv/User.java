@@ -8,6 +8,7 @@ public class User {
     String password;
     boolean isStudent;
     boolean isAdmin;
+    boolean isLoggedIn;
     List<Course> courses; // TODO: maybe use a resource manager Courses that handles which students are registered to which course
 
     public User(String username, String password, boolean isAdmin, boolean isStudent) {
@@ -15,6 +16,15 @@ public class User {
         this.password = password;
         this.isAdmin = isAdmin;
         this.isStudent = isStudent;
+    }
+
+    public boolean login(String password) {
+        isLoggedIn = (password.equals(this.password));
+        return isLoggedIn;
+    }
+
+    public String getUsername() {
+        return this.username;
     }
 
     public boolean isAdmin() {
