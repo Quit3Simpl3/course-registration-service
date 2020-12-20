@@ -14,6 +14,8 @@ public class Database {
 	// To prevent user from creating new Database
 	private Database() {
 		// TODO: implement
+		// 1. Read Courses.txt file
+		// 2. Parse into 
 	}
 
 	/**
