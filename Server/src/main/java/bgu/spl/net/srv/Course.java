@@ -4,6 +4,9 @@ package bgu.spl.net.srv;
  * Object representing a specific course in the Database
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -11,15 +14,19 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 public class Course {
     // private fields:
     final int courseNumber;
+    final String name;
+    final int[] kdam;
     ConcurrentHashMap<String, User> students;
     AtomicInteger freeSeats;
     final int maxStudents;
 
-    public Course(int numOfMaxStudents, int courseNumber) {
+    public Course(int numOfMaxStudents, int courseNumber, String name, int[] kdam) {
         this.courseNumber = courseNumber;
         this.maxStudents = numOfMaxStudents;
         this.freeSeats = new AtomicInteger(numOfMaxStudents);
         this.students = new ConcurrentHashMap<>();
+        this.name = name;
+        this.kdam = Arrays.copyOf(kdam, kdam.length); // Deep-copy (clone) the argument
     }
 
     public int getMaxStudents() {
@@ -55,11 +62,10 @@ public class Course {
     }
 
     public boolean isValid() {
-        // TODO
-        // courseNum int>= 0
-        // courseName non-empty
-        // KdamCoursesList - make sure all elements are int
-        // numOfMaxStudents int>=5
-        return false;
+        return (
+                this.courseNumber >= 0
+                && this.name.length() > 0
+                && this.maxStudents >= 5
+        );
     }
 }
