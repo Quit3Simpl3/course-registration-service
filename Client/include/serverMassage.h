@@ -9,12 +9,12 @@ class serverMassage {
 
 public:
 
-    serverMassage(connectionHandler* handler);
+    serverMassage(ConnectionHandler* handler);
 
     void run();
 
 private:
-    bool* terminate
+    bool* terminate;
 
 };
 

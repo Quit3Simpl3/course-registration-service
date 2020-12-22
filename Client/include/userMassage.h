@@ -10,12 +10,13 @@ class userMassage {
 
     public:
 
-        userMassage(connectionHandler* handler);
+        userMassage(ConnectionHandler* handler);
 
         void run();
 
     private:
-        bool* terminate
+        ConnectionHandler* handler;
+        bool* terminate;
 
 };
 

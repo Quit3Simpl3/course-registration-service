@@ -2,6 +2,11 @@
 #include "../include/connectionHandler.h"
 #include "../include/userMassage.h"
 #include "../include/serverMassage.h"
+#include "../src/connectionHandler.cpp"
+#include "../src/userMassage.cpp"
+#include "../src/serverMassage.cpp"
+
+
 #include <thread>
 
 
@@ -24,18 +29,14 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
-    //userMassage user(&connectionHandler);
+    userMassage userIn(&connectionHandler);
     serverMassage serverIn(&connectionHandler);
 
-
     thread server(&serverMassage::run, &serverIn);
-    thread user(&userMassage::run, &(userMassage userIn(&connectionHandler)))
+    thread user(&userMassage::run, &userIn);
 
-    server.join
-
-    x =s ;
-
-    int a = 2;
+    server.join();
+    user.join();
 
 
 
