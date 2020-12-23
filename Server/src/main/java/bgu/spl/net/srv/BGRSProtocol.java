@@ -3,6 +3,7 @@ package bgu.spl.net.srv;
 import bgu.spl.net.api.MessagingProtocol;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class BGRSProtocol implements MessagingProtocol<String> {
@@ -12,6 +13,20 @@ public class BGRSProtocol implements MessagingProtocol<String> {
     private void addMessageHandler(int opcode, String command, Function<String[], String> function) {
         this.messageHandlers.put(command, function);
         this.opcodeToCommand.put(opcode, command);
+    }
+
+    private Function<String[], String> getHandler(int opcode) {
+        String command = this.opcodeToCommand.get(opcode);
+        if (Objects.isNull(command))
+            throw new IllegalArgumentException("This command does not exist.");
+        return this.getHandler(command);
+    }
+
+    private Function<String[], String> getHandler(String command) {
+        Function<String[], String> func = this.messageHandlers.get(command);
+        if (Objects.isNull(func))
+            throw new IllegalArgumentException("This command does not exist.");
+        return func;
     }
 
     public BGRSProtocol() {
@@ -124,8 +139,14 @@ public class BGRSProtocol implements MessagingProtocol<String> {
 
     @Override
     public String process(String msg) {
-        // TODO: Implement this
-        return null;
+        String[] lines = msg.split(" ");
+        String command = lines[0]; // The first word in the message should be the command to execute
+        Function<String[], String> func = this.getHandler(command);
+
+        if (Objects.isNull(func))
+            return "ERROR: Illegal command provided.";
+
+        return func.apply(lines);
     }
 
     @Override
