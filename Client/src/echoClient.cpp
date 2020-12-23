@@ -35,7 +35,7 @@ int main (int argc, char *argv[]) {
     thread user(&userMassage::run, &userIn);
     thread server(&serverMassage::run, &serverIn);
 
-
+    //sync because we dont want to lose data from server
     server.join();
     user.join();
 

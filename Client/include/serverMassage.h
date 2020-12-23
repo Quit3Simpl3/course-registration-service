@@ -1,5 +1,6 @@
 #include "connectionHandler.h"
 
+
 #ifndef SPL_03_SERVERMASSAGE_H
 #define SPL_03_SERVERMASSAGE_H
 
@@ -7,16 +8,19 @@ using namespace std;
 
 class serverMassage {
 
-public:
+    public:
 
-    serverMassage(ConnectionHandler* handler);
+         serverMassage(ConnectionHandler* handler);
 
-    void run();
+         void run();
 
-private:
+    private:
+    ConnectionHandler* handler;
     bool* terminate;
+    std::map<std::string, void (*)(std::vector<string>)> my_map;
 
 };
+
 
 
 
