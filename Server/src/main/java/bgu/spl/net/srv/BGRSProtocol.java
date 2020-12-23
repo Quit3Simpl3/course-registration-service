@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static java.lang.Integer.parseInt;
+
 public class BGRSProtocol implements MessagingProtocol<String> {
     // Private fields:
     HashMap<String, Function<String[], String>> messageHandlers; // messageHandlers<command, function>
@@ -141,8 +143,14 @@ public class BGRSProtocol implements MessagingProtocol<String> {
     @Override
     public String process(String msg) {
         String[] lines = msg.split(" ");
-        String command = lines[0]; // The first word in the message should be the command to execute
-        Function<String[], String> func = this.getHandler(command);
+        String command = lines[0]; // The first word in the message is the command to execute
+        Function<String[], String> func = null;
+        try {
+            func = this.getHandler(parseInt(command)); // Try getting the command by its opcode
+        }
+        catch (IllegalArgumentException e) {
+            func = this.getHandler(command); // Try getting the command by its name
+        }
 
         if (Objects.isNull(func))
             return "ERROR: Illegal command provided.";
