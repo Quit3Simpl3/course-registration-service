@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class BGRSProtocol implements MessagingProtocol<String> {
+    // Private fields:
     HashMap<String, Function<String[], String>> messageHandlers; // messageHandlers<command, function>
     HashMap<Integer, String> opcodeToCommand;
 
