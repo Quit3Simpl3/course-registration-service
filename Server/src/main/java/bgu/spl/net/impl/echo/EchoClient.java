@@ -10,7 +10,7 @@ import java.net.Socket;
 public class EchoClient {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
-            args = new String[]{"localhost", "hello"};
+            args = new String[] {"localhost", "hello"};
         }
 
         if (args.length < 2) {

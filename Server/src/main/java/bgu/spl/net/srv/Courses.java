@@ -22,8 +22,10 @@ public class Courses {
     }
 
     private void addCourse(Course course) {
+        if (!Objects.isNull(this.courseIdToIndex.put(course.getCourseNumber(), this.courses.indexOf(course))))
+            throw new IllegalArgumentException("This course already exists.");
+
         this.courses.add(course); // Adds the course to the courses list
-        this.courseIdToIndex.put(course.getCourseNumber(), this.courses.indexOf(course));
     }
 
     public void createCourse(int courseNumber, int numOfMaxStudents, String name, int[] kdam) {
@@ -66,33 +68,14 @@ public class Courses {
      * Return a List of all courses the student is signed up to.
      */
     public List<Course> getStudentCourses(User student) {
-        if (student.isAdmin()) throw new IllegalArgumentException("The provided user is an admin, that cannot be signed-up to courses.");
+        if (student.isAdmin())
+            throw new IllegalArgumentException("The provided user is an admin, that cannot be signed-up to courses.");
 
         List<Course> userCourses = new ArrayList<>();
         for (Course course : this.courses)
             if (course.containsStudent(student))
                 userCourses.add(course);
+
         return userCourses;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -30,6 +30,16 @@ public class Database {
 		return this.courses.getCourse(id);
 	}
 
+	public void createStudent(String username, String password) {
+		createUser(username, password, false);
+	}
+
+	public void createUser(String username, String password, boolean isAdmin) {
+		User user = new User(username, password, isAdmin);
+		if (!Objects.isNull(this.users.putIfAbsent(username, user))) // If user doesn't exists, HashMap returns null
+			throw new IllegalArgumentException("This user already exists.");
+	}
+
 	public User getUser(String username) {
 		User user = this.users.get(username);
 		if (Objects.isNull(user))
@@ -73,7 +83,7 @@ public class Database {
 	// Private to prevent user from creating new Database
 	private Database() {
 		this.courses = Courses.getInstance();
-		this.input_file_path = "./resources/Courses.txt";
+		this.input_file_path = "./Courses.txt";
 		this.initialize(this._get_input_file_path());
 	}
 
@@ -85,7 +95,7 @@ public class Database {
 	}
 	
 	/**
-	 * loades the courses from the file path specified 
+	 * loads the courses from the file path specified
 	 * into the Database, returns true if successful.
 	 */
 	boolean initialize(String coursesFilePath) {
