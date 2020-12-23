@@ -2,7 +2,9 @@ package bgu.spl.net.srv;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,7 +21,8 @@ import static java.lang.Integer.parseInt;
 public class Database {
 	// private fields:
 	ConcurrentHashMap<String, User> users; // users<String username, User user>
-	ConcurrentHashMap<Integer, Course> courses; // courses<int courseNumber, Course course>
+//	ConcurrentHashMap<Integer, Course> courses; // courses<int courseNumber, Course course>
+	Courses courses;
 
 	String input_file_path;
 
@@ -27,17 +30,20 @@ public class Database {
 		private final static Database instance = new Database();
 	}
 
+	private Course getCourseByID(int id) {
+		for(Course course : this.courses)
+			if (course.getCourseNumber() == id) return course;
+		throw new NoSuchElementException("Course number " + id + " does not exist.");
+	}
+
 	private String _get_input_file_path() {
 		return this.input_file_path;
 	}
 
-	private Course createCourse(int numOfMaxStudents, int courseNumber, String name, int[] kdam) {
-		return new Course(numOfMaxStudents, courseNumber, name, kdam);
-	}
-
-	private void generateCoursesFromFile() {
-		File file = new File(_get_input_file_path());
+	private void generateCoursesFromFile(String coursesFilePath) {
+		File file = new File(coursesFilePath);
 		try (Scanner reader = new Scanner(file)) {
+			// Read the courses file line by line so as to keep them ordered
 			while (reader.hasNextLine()) {
 				//File format: number|name|[kdamnumber1, kdamnumber2]|seats
 				String line = reader.nextLine();
@@ -47,15 +53,12 @@ public class Database {
 				int[] kdam_numbers = new int[kdam.length];
 				for (int i = 0; i < kdam.length; i++) kdam_numbers[i] = parseInt(kdam[i]);
 
-				// Add the new course to the courses hashmap:
-				this.courses.put(
-					parseInt(data[0]),
-					createCourse(
-						parseInt(data[3]),
-						parseInt(data[0]),
-						data[1],
-						kdam_numbers
-					)
+				// Add the new course to the courses list (by order of appearance in the courses file):
+				courses.createCourse(
+					parseInt(data[0]), // courseNumber
+					parseInt(data[3]), // numOfMaxStudents
+					data[1], // name
+					kdam_numbers // kdam courses
 				);
 			}
 		}
@@ -66,8 +69,9 @@ public class Database {
 
 	// Private to prevent user from creating new Database
 	private Database() {
-		this.courses = new ConcurrentHashMap<>();
+		this.courses = Courses.getInstance();
 		this.input_file_path = "./resources/Courses.txt";
+		this.initialize(this._get_input_file_path());
 	}
 
 	/**
@@ -78,9 +82,8 @@ public class Database {
 	}
 
 	private boolean validateCourses() {
-		for (Integer course_number : this.courses.keySet()) {
-			if (!(this.courses.get(course_number)).isValid()) return false;
-		}
+		for (Course course : this.courses)
+			if (!course.isValid()) return false;
 		return true;
 	}
 	
@@ -89,7 +92,7 @@ public class Database {
 	 * into the Database, returns true if successful.
 	 */
 	boolean initialize(String coursesFilePath) {
-		generateCoursesFromFile();
+		generateCoursesFromFile(coursesFilePath);
 		return validateCourses();
 	}
 }

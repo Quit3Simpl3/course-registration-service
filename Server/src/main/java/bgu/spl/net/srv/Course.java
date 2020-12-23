@@ -20,7 +20,7 @@ public class Course {
     AtomicInteger freeSeats;
     final int maxStudents;
 
-    public Course(int numOfMaxStudents, int courseNumber, String name, int[] kdam) {
+    public Course(int courseNumber, int numOfMaxStudents, String name, int[] kdam) {
         this.courseNumber = courseNumber;
         this.maxStudents = numOfMaxStudents;
         this.freeSeats = new AtomicInteger(numOfMaxStudents);
@@ -67,5 +67,9 @@ public class Course {
                 && this.name.length() > 0
                 && this.maxStudents >= 5
         );
+    }
+
+    public int getCourseNumber() {
+        return this.courseNumber;
     }
 }
