@@ -32,8 +32,9 @@ int main (int argc, char *argv[]) {
     userMassage userIn(&connectionHandler);
     serverMassage serverIn(&connectionHandler);
 
-    thread server(&serverMassage::run, &serverIn);
     thread user(&userMassage::run, &userIn);
+    thread server(&serverMassage::run, &serverIn);
+
 
     server.join();
     user.join();

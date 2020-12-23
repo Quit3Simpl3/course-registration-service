@@ -13,15 +13,27 @@ void userMassage::run() {
     *terminate = false;
 
     while(!(*terminate)) {
-        char inCode[2]; //create because we need char[2] for connectionhandler
-        vector<string> inPutLine; //holding the line
+        //char inCode[2]; //create because we need char[2] for connectionhandler
+        //vector<string> inPutLine; //holding the line
         const short bufsize = 1024;
         char buf[bufsize];
         cin.getline(buf, bufsize);
         string line(buf);
         int len = line.length();
+
+        if (!handler->sendLine(line)) {
+            std::cout << "Disconnected. Exiting...\n" << std::endl;
+            *terminate = true;
+        } else
+            std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
+        }
+
+
+
+
         //take the massage part by part into vect:
-        boost::split(inPutLine, line, boost::is_any_of("\0"));
+       // boost::split(inPutLine, line, boost::is_any_of(" "));
+       /*
         //Opcode 1:
         if (inPutLine[0] == "ADMINREG") {}
         //Opcode 2:
@@ -51,4 +63,5 @@ void userMassage::run() {
 
 
     }
+    */
 }
