@@ -1,26 +1,40 @@
 package bgu.spl.net.srv;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
     // private fields:
     String username;
     String password;
-    boolean isStudent;
     boolean isAdmin;
     boolean isLoggedIn;
-    List<Course> courses; // TODO: maybe use a resource manager Courses that handles which students are registered to which course
+    ArrayList<Course> courses;
 
-    public User(String username, String password, boolean isAdmin, boolean isStudent) {
+    public User(String username, String password) {
+        new User(username, password, false);
+    }
+
+    public User(String username, String password, boolean isAdmin) {
         this.username = username;
         this.password = password;
         this.isAdmin = isAdmin;
-        this.isStudent = isStudent;
+        this.isLoggedIn = false;
     }
 
-    public boolean login(String password) {
-        isLoggedIn = (password.equals(this.password));
-        return isLoggedIn;
+    public void login(String password) throws Exception {
+        if (this.isLoggedIn()) // Check whether the user is already logged in
+            throw new Exception("The user is already logged in.");
+        else
+            this.isLoggedIn = (password.equals(this.password));
+    }
+
+    public void logout() {
+        this.isLoggedIn = false;
+    }
+
+    public boolean isLoggedIn() {
+        return this.isLoggedIn;
     }
 
     public String getUsername() {
@@ -31,23 +45,11 @@ public class User {
         return this.isAdmin;
     }
 
-    public boolean isStudent() {
-        return this.isAdmin;
+    public List<Course> getCourses() {
+        return Courses.getInstance().getStudentCourses(this);
     }
 
-    public void setAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-
-    public void setStudent(boolean isStudent) {
-        this.isStudent = isStudent;
-    }
-
-    public boolean registerCourse(Course course) {
-        // TODO:
-        // 1. check seats
-        // 2. check kdam
-        // 3. register (DANGER!!! must be synchronized to prevent two students registering at once)
-        return false;
+    public void registerCourse(Course course) throws Exception {
+        Courses.getInstance().register(course, this);
     }
 }

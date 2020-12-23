@@ -1,9 +1,6 @@
 package bgu.spl.net.srv;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -34,8 +31,8 @@ public class Courses {
         this.addCourse(course); // Add the course to the list and hashmap
     }
 
-    public boolean register(Course course, User user) {
-        return course.register(user);
+    public void register(Course course, User user) throws Exception {
+        course.register(user);
     }
 
     /**
@@ -63,6 +60,19 @@ public class Courses {
         for (Course course : this.courses)
             if (!course.isValid()) return false;
         return true;
+    }
+
+    /**
+     * Return a List of all courses the student is signed up to.
+     */
+    public List<Course> getStudentCourses(User student) {
+        if (student.isAdmin()) throw new IllegalArgumentException("The provided user is an admin, that cannot be signed-up to courses.");
+
+        List<Course> userCourses = new ArrayList<>();
+        for (Course course : this.courses)
+            if (course.containsStudent(student))
+                userCourses.add(course);
+        return userCourses;
     }
 }
 

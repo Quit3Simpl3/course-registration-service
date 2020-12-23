@@ -2,10 +2,7 @@ package bgu.spl.net.srv;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Integer.parseInt;
@@ -31,6 +28,14 @@ public class Database {
 
 	public Course getCourse(int id) {
 		return this.courses.getCourse(id);
+	}
+
+	public User getUser(String username) {
+		User user = this.users.get(username);
+		if (Objects.isNull(user))
+			throw new IllegalArgumentException("User " + username + " does not exist.");
+
+		return user;
 	}
 
 	private String _get_input_file_path() {
