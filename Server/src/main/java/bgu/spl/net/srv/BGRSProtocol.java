@@ -2,6 +2,7 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessagingProtocol;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Function;
@@ -12,6 +13,7 @@ public class BGRSProtocol implements MessagingProtocol<String> {
     // Private fields:
     HashMap<String, Function<String[], String>> messageHandlers; // messageHandlers<command, function>
     HashMap<Integer, String> opcodeToCommand;
+    Database database;
 
     private void addMessageHandler(int opcode, String command, Function<String[], String> function) {
         this.messageHandlers.put(command, function);
@@ -32,37 +34,71 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         return func;
     }
 
+    /**
+     * Used to return ACK message in the message handler functions.
+     * @return
+     */
+    private String ack() {
+        return "ACK";
+    }
+
     public BGRSProtocol() {
+        // Create Database instance:
+        this.database = Database.getInstance();
         // Create message handlers and add them to the hashmap:
         this.addMessageHandler(
                 1,
                 "ADMINREG",
                 (lines)->{
-                    // TODO
-                    return "";
+                    // lines[0] = command name, lines[1] = username, lines[2] = password
+                    String username = lines[1];
+                    String password = lines[2];
+                    try {
+                        database.createUser(username, password, true);
+                    }
+                    catch (IllegalArgumentException e) {
+                        return e.getMessage();
+                    }
+                    return ack();
                 }
         );
         this.addMessageHandler(
                 2,
                 "STUDENTREG",
                 (lines)->{
-                    // TODO
-                    return "";
+                    // lines[0] = command name, lines[1] = username, lines[2] = password
+                    String username = lines[1];
+                    String password = lines[2];
+                    try {
+                        database.createStudent(username, password);
+                    }
+                    catch (IllegalArgumentException e) {
+                        return e.getMessage();
+                    }
+                    return ack();
                 }
         );
         this.addMessageHandler(
                 3,
                 "LOGIN",
                 (lines)->{
-                    // TODO
-                    return "";
+                    // lines[0] = command name, lines[1] = username, lines[2] = password
+                    String username = lines[1];
+                    String password = lines[2];
+                    try {
+                        database.userLogin(username, password);
+                    }
+                    catch (IllegalArgumentException e) {
+                        return e.getMessage();
+                    }
+                    return ack();
                 }
         );
         this.addMessageHandler(
                 4,
                 "LOGOUT",
                 (lines)->{
-                    // TODO
+                    // TODO: how does the server know which client to logout?
                     return "";
                 }
         );
