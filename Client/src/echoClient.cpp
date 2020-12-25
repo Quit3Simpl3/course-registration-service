@@ -1,5 +1,15 @@
 #include <stdlib.h>
-#include <connectionHandler.h>
+#include "../include/connectionHandler.h"
+#include "../include/userMassage.h"
+#include "../include/serverMassage.h"
+#include "../src/connectionHandler.cpp"
+#include "../src/userMassage.cpp"
+#include "../src/serverMassage.cpp"
+
+
+#include <thread>
+
+
 
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
@@ -9,6 +19,7 @@ int main (int argc, char *argv[]) {
         std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
         return -1;
     }
+
     std::string host = argv[1];
     short port = atoi(argv[2]);
     
@@ -17,7 +28,21 @@ int main (int argc, char *argv[]) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
-	
+
+    userMassage userIn(&connectionHandler);
+    serverMassage serverIn(&connectionHandler);
+
+    thread user(&userMassage::run, &userIn);
+    thread server(&serverMassage::run, &serverIn);
+
+    //sync because we dont want to lose data from server
+    server.join();
+    user.join();
+
+
+
+
+	/*
 	//From here we will see the rest of the ehco client implementation:
     while (1) {
         const short bufsize = 1024;
@@ -55,5 +80,6 @@ int main (int argc, char *argv[]) {
             break;
         }
     }
+    */
     return 0;
 }
