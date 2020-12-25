@@ -3,9 +3,7 @@ package bgu.spl.net.srv;
 import bgu.spl.net.api.MessagingProtocol;
 
 import javax.xml.crypto.Data;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.lang.Integer.parseInt;
@@ -31,14 +29,14 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         catch (IllegalArgumentException e) {
             return error(msg_opcode);
         }
-        return ack(1, "");
+        return ack(1);
     }
 
     public BGRSProtocol() {
         // Create Database instance:
         this.database = Database.getInstance();
 
-        this.client = this.database.clients.assign();
+        this.client = this.database.Clients().assign();
         this.messageHandlers = new HashMap<>();
         // Create message handlers and add them to the hashmap:
         this.addMessageHandler(
@@ -70,10 +68,10 @@ public class BGRSProtocol implements MessagingProtocol<String> {
                     try {
                         client.setUser(this.database.userLogin(username, password));
                     }
-                    catch (IllegalArgumentException e) {
+                    catch (Exception e) {
                         return error(3);
                     }
-                    return ack(3, "");
+                    return ack(3);
                 }
         );
         this.addMessageHandler(
@@ -85,29 +83,82 @@ public class BGRSProtocol implements MessagingProtocol<String> {
                     catch (Exception e) {
                         error(4);
                     }
-                    return ack(4, "");
+                    return ack(4);
                 }
         );
         this.addMessageHandler(
                 5, // "COURSEREG"
                 (words)->{
-                    String course_number = words[1];
-                    Course course = database.getCourses().getCourse(course_number);
-                    database.
+                    String courseNum = words[1];
+                    try {
+                        Course course = database.Courses().getCourse(parseInt(courseNum));
+                        database.Courses().register(course, client.getUser());
+                    }
+                    catch (Exception e) {
+                        return error(5);
+                    }
+                    return ack(5);
                 }
         );
         this.addMessageHandler(
                 6, // "KDAMCHECK"
                 (words)->{
-                    // TODO
-                    return "";
+                    String courseNum = words[1];
+                    try {
+                        Course course = database.Courses().getCourse(parseInt(courseNum));
+
+                        // Create kdam courses string list:
+                        String kdamCourses = "[";
+                        int[] kdam = course.getKdam();
+                        for (int k = 0; k < kdam.length-1; k++)
+                            kdamCourses += kdam[k] + ",";
+                        kdamCourses += kdam[kdam.length-1] + "]"; // Add the last course without ","
+
+                        return ack(6, kdamCourses);
+                    }
+                    catch (Exception e) {
+                        return error(6);
+                    }
                 }
         );
         this.addMessageHandler(
-                7,
+                7, // "COURSESTAT" // Admin only!
                 (words)->{
-                    // TODO
-                    return "";
+                    String courseNum = words[1];
+                    try {
+                        if (!client.getUser().isAdmin())
+                            throw new IllegalArgumentException("Admin privileges required.");
+
+                        Course course = database.Courses().getCourse(parseInt(courseNum));
+                        String courseName = course.getName();
+                        int freeSeats = course.getAvailableSeats();
+                        int maxSeats = course.getMaxStudents();
+
+                        List<User> students = course.getStudents();
+                        String[] studentNames = new String[students.size()];
+                        int i = 0;
+                        for (User student : students) {
+                            studentNames[i] = student.getUsername();
+                            i++;
+                        }
+                        Arrays.sort(studentNames); // Sort them alphabetically
+                        String names = "[";
+                        for (i = 0; i < studentNames.length-1; i++)
+                            names += studentNames[i] + ",";
+                        names += studentNames[studentNames.length-1] + "]"; // Add last name without ","
+
+                        return ack(
+                                7,
+                                courseNum + "\0"
+                                        + courseName + "\0"
+                                        + freeSeats + "\0"
+                                        + maxSeats + "\0"
+                                        + names
+                        );
+                    }
+                    catch (Exception e) {
+                        return error(7);
+                    }
                 }
         );
         this.addMessageHandler(
@@ -166,6 +217,10 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         if (response.length() > 0)
             return Arrays.toString(ch_opcode) + "\0" + Arrays.toString(ch_msg_opcode) + "\0" + response;
         return Arrays.toString(ch_opcode) + "\0" + Arrays.toString(ch_msg_opcode);
+    }
+
+    private String ack(int msg_opcode) {
+        return ack(msg_opcode, "");
     }
 
     private String ack(int msg_opcode, String response) { // ACK OPCODE = 12

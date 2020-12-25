@@ -22,11 +22,13 @@ public class User {
         this.isLoggedIn = false;
     }
 
-    public void login(String password) throws Exception {
+    public boolean login(String password) throws Exception {
         if (this.isLoggedIn()) // Check whether the user is already logged in
             throw new Exception("The user is already logged in.");
-        else
+        else {
             this.isLoggedIn = (password.equals(this.password));
+            return this.isLoggedIn();
+        }
     }
 
     public void logout() {

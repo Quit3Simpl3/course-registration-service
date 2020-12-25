@@ -19,6 +19,7 @@ public class Database {
 	// private fields:
 	ConcurrentHashMap<String, User> users; // users<String username, User user>
 	Courses courses;
+	Clients clients;
 
 	String input_file_path;
 
@@ -26,18 +27,30 @@ public class Database {
 		private final static Database instance = new Database();
 	}
 
-	public Course getCourse(int id) {
-		return this.courses.getCourse(id);
+	public User userLogin(String username, String password) throws Exception {
+		User user = this.getUser(username);
+		if (user.login(password))
+			return user;
+		return null;
+	}
+
+	public Courses Courses() {
+		return this.courses;
+	}
+
+	public Clients Clients() {
+		return this.clients;
 	}
 
 	public void createStudent(String username, String password) {
 		createUser(username, password, false);
 	}
 
-	public void createUser(String username, String password, boolean isAdmin) {
+	public User createUser(String username, String password, boolean isAdmin) {
 		User user = new User(username, password, isAdmin);
 		if (!Objects.isNull(this.users.putIfAbsent(username, user))) // If user doesn't exists, HashMap returns null
 			throw new IllegalArgumentException("This user already exists.");
+		return user;
 	}
 
 	public User getUser(String username) {
@@ -83,6 +96,8 @@ public class Database {
 	// Private to prevent user from creating new Database
 	private Database() {
 		this.courses = Courses.getInstance();
+		this.clients = Clients.getInstance();
+
 		this.input_file_path = "./Courses.txt";
 		this.initialize(this._get_input_file_path());
 	}

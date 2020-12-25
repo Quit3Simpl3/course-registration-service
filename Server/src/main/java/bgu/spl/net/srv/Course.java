@@ -30,6 +30,14 @@ public class Course {
         this.kdam = Arrays.copyOf(kdam, kdam.length); // Deep-copy (clone) the argument
     }
 
+    public int[] getKdam() {
+        return this.kdam;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
     public List<User> getStudents() {
         List<User> students = new ArrayList<>();
         for (User user : this.students.values())
