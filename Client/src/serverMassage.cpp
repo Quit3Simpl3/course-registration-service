@@ -21,7 +21,7 @@ void serverMassage::run() {
 
     while (!(*terminate)) {
 
-        }
+
 
     }
 }
