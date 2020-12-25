@@ -14,9 +14,20 @@ class userMassage {
 
         void run();
 
+
+    //void shortToBytes(short num, char *bytesAr);
+
+
     private:
         ConnectionHandler* handler;
         bool* terminate;
+        std::map<std::string, void (*)(char a[],std::vector<string>,ConnectionHandler* h)> my_map;
+        vector<string> inPutLine;
+        char opCode[2];
+
+
+
+
 
 };
 

@@ -17,7 +17,7 @@ class serverMassage {
     private:
     ConnectionHandler* handler;
     bool* terminate;
-    std::map<std::string, void (*)(std::vector<string>)> my_map;
+    std::map<int, void (*)(std::vector<string>)> my_map;
 
 };
 
