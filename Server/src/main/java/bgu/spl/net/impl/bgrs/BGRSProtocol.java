@@ -1,6 +1,10 @@
-package bgu.spl.net.srv;
+package bgu.spl.net.impl.bgrs;
 
 import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.srv.Client;
+import bgu.spl.net.srv.Course;
+import bgu.spl.net.srv.Database;
+import bgu.spl.net.srv.User;
 
 import javax.xml.crypto.Data;
 import java.util.*;
@@ -162,10 +166,30 @@ public class BGRSProtocol implements MessagingProtocol<String> {
                 }
         );
         this.addMessageHandler(
-                8,
+                8, // "STUDENTSTAT" // Admin Only!
                 (words)->{
-                    // TODO
-                    return "";
+                    String username = words[1];
+                    try {
+                        if (!client.getUser().isAdmin())
+                            throw new IllegalArgumentException("Admin privileges required.");
+
+                        User student = database.getUser(username);
+                        if (student.isAdmin())
+                            throw new IllegalArgumentException("Provided user is admin.");
+
+                        List<Course> courses = student.getCourses();
+                        String courseNames = "[";
+                        for (Course course : courses)
+                            courseNames += String.valueOf(course.getCourseNumber()) + ",";
+                        if (courseNames.length() > 1)
+                            courseNames = courseNames.substring(0, courseNames.length()-1); // Don't include last ","
+                        courseNames += "]"; // Add closing "]"
+
+                        return ack(8,student.getUsername() + "\0" + courseNames);
+                    }
+                    catch (Exception e) {
+                        return error(8);
+                    }
                 }
         );
         this.addMessageHandler(

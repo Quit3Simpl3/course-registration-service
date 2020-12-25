@@ -18,6 +18,7 @@ public class Courses {
     }
 
     private Courses() {
+        this.courseIdToIndex = new ConcurrentHashMap<>();
         this.courses = new CopyOnWriteArrayList<>();
     }
 

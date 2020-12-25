@@ -1,0 +1,2 @@
+100|Data Structures|[]|250
+101|System Programming|[100]|150

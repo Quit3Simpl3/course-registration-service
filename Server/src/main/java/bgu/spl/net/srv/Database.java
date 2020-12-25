@@ -65,7 +65,7 @@ public class Database {
 		return this.input_file_path;
 	}
 
-	private void generateCoursesFromFile(String coursesFilePath) {
+	private void generateCoursesFromFile(String coursesFilePath) throws FileNotFoundException {
 		File file = new File(coursesFilePath);
 		try (Scanner reader = new Scanner(file)) {
 			// Read the courses file line by line so as to keep them ordered
@@ -75,9 +75,15 @@ public class Database {
 				String[] data = line.split("\\|");
 
 				// Create an array of kdam courses:
-				String[] kdam = data[2].split("\\|");
-				int[] kdam_numbers = new int[kdam.length];
-				for (int i = 0; i < kdam.length; i++) kdam_numbers[i] = parseInt(kdam[i]);
+				int[] kdam_numbers;
+				if (!data[2].equals("[]")) {
+					String[] kdam = data[2].substring(1, data[2].length()-1).split(",");
+					kdam_numbers = new int[kdam.length];
+					for (int i = 0; i < kdam.length; i++) kdam_numbers[i] = parseInt(kdam[i]);
+				}
+				else {
+					kdam_numbers = new int[0];
+				}
 
 				// Add the new course to the courses list (by order of appearance in the courses file):
 				courses.createCourse(
@@ -89,7 +95,7 @@ public class Database {
 			}
 		}
 		catch (FileNotFoundException e) {
-			System.out.println("Courses.txt file not found in path: " + _get_input_file_path());
+			throw new FileNotFoundException("Courses.txt file not found in path: " + _get_input_file_path());
 		}
 	}
 
@@ -114,7 +120,13 @@ public class Database {
 	 * into the Database, returns true if successful.
 	 */
 	boolean initialize(String coursesFilePath) {
-		generateCoursesFromFile(coursesFilePath);
+		try {
+			generateCoursesFromFile(coursesFilePath);
+		}
+		catch (FileNotFoundException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
 		return this.courses.validateCourses();
 	}
 }

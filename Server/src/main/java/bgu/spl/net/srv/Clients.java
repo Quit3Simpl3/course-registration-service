@@ -1,6 +1,7 @@
 package bgu.spl.net.srv;
 
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,7 +26,7 @@ public class Clients {
      * @return - Client object matching the UUID.
      */
     public Client assign() {
-        Client client = new Client();
+        Client client = new Client(UUID.randomUUID().toString());
         return this.clients.put(client.getId(), client);
     }
 

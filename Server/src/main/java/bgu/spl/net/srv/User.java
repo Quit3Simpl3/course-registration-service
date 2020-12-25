@@ -1,6 +1,5 @@
 package bgu.spl.net.srv;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -9,7 +8,6 @@ public class User {
     String password;
     boolean isAdmin;
     boolean isLoggedIn;
-    ArrayList<Course> courses;
 
     public User(String username, String password) {
         new User(username, password, false);
