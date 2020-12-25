@@ -1,6 +1,11 @@
 package bgu.spl.net.srv;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.Integer.parseInt;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -12,19 +17,74 @@ import java.util.List;
  */
 public class Database {
 	// private fields:
-	// TODO: users hashtable
-	// TODO: HashMap<int courseNumber, Course course>
-	// Courses Class: List<Course>
+	ConcurrentHashMap<String, User> users; // users<String username, User user>
+	Courses courses;
+
+	String input_file_path;
 
 	private final static class SingletonHolder {
 		private final static Database instance = new Database();
 	}
 
-	// To prevent user from creating new Database
+	public Course getCourse(int id) {
+		return this.courses.getCourse(id);
+	}
+
+	public void createStudent(String username, String password) {
+		createUser(username, password, false);
+	}
+
+	public void createUser(String username, String password, boolean isAdmin) {
+		User user = new User(username, password, isAdmin);
+		if (!Objects.isNull(this.users.putIfAbsent(username, user))) // If user doesn't exists, HashMap returns null
+			throw new IllegalArgumentException("This user already exists.");
+	}
+
+	public User getUser(String username) {
+		User user = this.users.get(username);
+		if (Objects.isNull(user))
+			throw new IllegalArgumentException("User " + username + " does not exist.");
+
+		return user;
+	}
+
+	private String _get_input_file_path() {
+		return this.input_file_path;
+	}
+
+	private void generateCoursesFromFile(String coursesFilePath) {
+		File file = new File(coursesFilePath);
+		try (Scanner reader = new Scanner(file)) {
+			// Read the courses file line by line so as to keep them ordered
+			while (reader.hasNextLine()) {
+				//File format: number|name|[kdamnumber1, kdamnumber2]|seats
+				String line = reader.nextLine();
+				String[] data = line.split("\\|");
+
+				// Create an array of kdam courses:
+				String[] kdam = data[2].split("\\|");
+				int[] kdam_numbers = new int[kdam.length];
+				for (int i = 0; i < kdam.length; i++) kdam_numbers[i] = parseInt(kdam[i]);
+
+				// Add the new course to the courses list (by order of appearance in the courses file):
+				courses.createCourse(
+					parseInt(data[0]), // courseNumber
+					parseInt(data[3]), // numOfMaxStudents
+					data[1], // name
+					kdam_numbers // kdam courses
+				);
+			}
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Courses.txt file not found in path: " + _get_input_file_path());
+		}
+	}
+
+	// Private to prevent user from creating new Database
 	private Database() {
-		// TODO: implement
-		// 1. Read Courses.txt file
-		// 2. Parse into
+		this.courses = Courses.getInstance();
+		this.input_file_path = "./Courses.txt";
+		this.initialize(this._get_input_file_path());
 	}
 
 	/**
@@ -35,11 +95,11 @@ public class Database {
 	}
 	
 	/**
-	 * loades the courses from the file path specified 
+	 * loads the courses from the file path specified
 	 * into the Database, returns true if successful.
 	 */
 	boolean initialize(String coursesFilePath) {
-		// TODO: implement
-		return false;
+		generateCoursesFromFile(coursesFilePath);
+		return this.courses.validateCourses();
 	}
 }
