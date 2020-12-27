@@ -111,6 +111,7 @@ public class Database {
 	private Database() {
 		this.courses = Courses.getInstance();
 		this.clients = Clients.getInstance();
+		this.users = new ConcurrentHashMap<>();
 
 		this.input_file_path = "./Courses.txt";
 		this.initialize(this._get_input_file_path());

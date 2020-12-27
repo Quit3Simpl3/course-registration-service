@@ -60,8 +60,8 @@ public class BGRSProtocol implements MessagingProtocol<String> {
                 2, // "STUDENTREG"
                 (words)->{
                     // words[1] = username, words[2] = password
-                    String username = words[1];
-                    String password = words[2];
+                    String username = words[0];
+                    String password = words[1];
 
                     return createUser(2, username, password, false);
                 }
@@ -230,8 +230,8 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         );
     }
 
-    private void shortToByte(char[] c, short opcode) {
-        // TODO
+    private void shortToByte(char[] ch, short opcode) {
+        ch = new char[] {'h', 'i'}; // TODO: IMPLEMENT
     }
 
     private String respond(int opcode, int msg_opcode, String response) {
@@ -258,8 +258,12 @@ public class BGRSProtocol implements MessagingProtocol<String> {
 
     @Override
     public String process(String msg) {
-        String opcode = msg.substring(0, 5); // Get the 4 digit opcode
-        String[] words = (msg.substring(5)).split("\0");
+        // TODO
+        System.out.println("msg: " + msg);
+        // TODO
+
+        String opcode = msg.substring(0, 1); // Get the 4 digit opcode
+        String[] words = (msg.substring(2)).split(" ");
 
         Function<String[], String> func = this.getHandler(parseInt(opcode)); // Try getting the command by its opcode
 
