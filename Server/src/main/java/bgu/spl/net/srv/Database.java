@@ -27,11 +27,22 @@ public class Database {
 		private final static Database instance = new Database();
 	}
 
-	public User userLogin(String username, String password) throws Exception {
+	public void userLogin(String clientId, String username, String password) throws Exception {
 		User user = this.getUser(username);
-		if (user.login(password))
-			return user;
-		return null;
+		if (user.login(password)) {
+			this.Clients().get(clientId).setUser(user);
+		}
+		else {
+			throw new Exception("Wrong password.");
+		}
+	}
+
+	public void logoutUser(String clientId) {
+		// get(clientId) handles no client error,
+		// client.getUser() handles no user error,
+		// user.logout() handles user not logged-in error (though never should happen).
+		if (this.Clients().get(clientId).getUser().logout()) // logout user
+			this.Clients().get(clientId).removeUser(); // remove the user association to the client
 	}
 
 	public Courses Courses() {
@@ -75,14 +86,11 @@ public class Database {
 				String[] data = line.split("\\|");
 
 				// Create an array of kdam courses:
-				int[] kdam_numbers;
+				List<Integer> kdam_numbers = new ArrayList<>();
 				if (!data[2].equals("[]")) {
 					String[] kdam = data[2].substring(1, data[2].length()-1).split(",");
-					kdam_numbers = new int[kdam.length];
-					for (int i = 0; i < kdam.length; i++) kdam_numbers[i] = parseInt(kdam[i]);
-				}
-				else {
-					kdam_numbers = new int[0];
+					for (String kdam_num : kdam)
+						kdam_numbers.add(parseInt(kdam_num));
 				}
 
 				// Add the new course to the courses list (by order of appearance in the courses file):

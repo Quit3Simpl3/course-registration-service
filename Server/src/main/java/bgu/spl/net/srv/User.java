@@ -29,8 +29,9 @@ public class User {
         }
     }
 
-    public void logout() {
+    public boolean logout() {
         this.isLoggedIn = false;
+        return !this.isLoggedIn();
     }
 
     public boolean isLoggedIn() {
@@ -47,9 +48,5 @@ public class User {
 
     public List<Course> getCourses() {
         return Courses.getInstance().getStudentCourses(this);
-    }
-
-    public void registerCourse(Course course) throws Exception {
-        Courses.getInstance().register(course, this);
     }
 }

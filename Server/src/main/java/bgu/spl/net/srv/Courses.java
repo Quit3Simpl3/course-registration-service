@@ -29,13 +29,17 @@ public class Courses {
         this.courses.add(course); // Adds the course to the courses list
     }
 
-    public void createCourse(int courseNumber, int numOfMaxStudents, String name, int[] kdam) {
+    public void createCourse(int courseNumber, int numOfMaxStudents, String name, List<Integer> kdam) {
         Course course = new Course(courseNumber, numOfMaxStudents, name, kdam);
         this.addCourse(course); // Add the course to the list and hashmap
     }
 
     public void register(Course course, User user) throws Exception {
         course.register(user);
+    }
+
+    public boolean unregister(Course course, User user) {
+        return course.unregister(user);
     }
 
     /**
@@ -69,14 +73,25 @@ public class Courses {
      * Return a List of all courses the student is signed up to.
      */
     public List<Course> getStudentCourses(User student) {
-        if (student.isAdmin())
-            throw new IllegalArgumentException("The provided user is an admin, that cannot be signed-up to courses.");
+//        if (student.isAdmin()) // TODO: is this necessary for opcode 11?
+//            throw new IllegalArgumentException("The provided user is an admin, that cannot be signed-up to courses.");
 
         List<Course> userCourses = new ArrayList<>();
+        // Add the courses to the userCourses list by order of appearance in Courses.txt:
         for (Course course : this.courses)
             if (course.containsStudent(student))
                 userCourses.add(course);
 
         return userCourses;
+    }
+
+    /**
+     * Returns whether the student is registered to the course.
+     * @param student - The student's user object.
+     * @param course - The course object.
+     * @return true iff the student is registered to the course.
+     */
+    public boolean isStudentRegistered(User student, Course course) {
+        return course.containsStudent(student);
     }
 }

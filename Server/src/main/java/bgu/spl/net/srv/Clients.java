@@ -27,7 +27,8 @@ public class Clients {
      */
     public Client assign() {
         Client client = new Client(UUID.randomUUID().toString());
-        return this.clients.put(client.getId(), client);
+        this.clients.put(client.getId(), client);
+        return client;
     }
 
     /**
@@ -37,5 +38,14 @@ public class Clients {
      */
     public Client get(String clientId) {
         return this.clients.get(clientId);
+    }
+
+    /**
+     * Associates a user object with a client object.
+     */
+    public void setUser(String clientId, String username) {
+        Client client = this.get(clientId);
+        User user = Database.getInstance().getUser(username);
+        client.setUser(user);
     }
 }

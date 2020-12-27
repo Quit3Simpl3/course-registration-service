@@ -6,6 +6,7 @@ package bgu.spl.net.srv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,23 +15,25 @@ public class Course {
     // private fields:
     final int courseNumber;
     final String name;
-    final int[] kdam;
+    final List<Integer> kdam;
     ConcurrentHashMap<String, User> students;
     AtomicInteger freeSeats;
     final int maxStudents;
     Courses courses;
 
-    public Course(int courseNumber, int numOfMaxStudents, String name, int[] kdam) {
+    public Course(int courseNumber, int numOfMaxStudents, String name, List<Integer> kdam) {
         this.courses = Courses.getInstance();
         this.courseNumber = courseNumber;
         this.maxStudents = numOfMaxStudents;
         this.freeSeats = new AtomicInteger(numOfMaxStudents);
         this.students = new ConcurrentHashMap<>();
         this.name = name;
-        this.kdam = Arrays.copyOf(kdam, kdam.length); // Deep-copy (clone) the argument
+
+        this.kdam = new ArrayList<>();
+        Collections.copy(this.kdam, kdam); // Deep-copy (clone) the argument
     }
 
-    public int[] getKdam() {
+    public List<Integer> getKdam() {
         return this.kdam;
     }
 

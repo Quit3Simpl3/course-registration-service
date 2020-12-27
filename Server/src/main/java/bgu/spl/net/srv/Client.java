@@ -18,7 +18,14 @@ public class Client {
     }
 
     public void setUser(User user) {
+        if (!Objects.isNull(this.user))
+            throw new IllegalStateException("Client is already logged-in with a different user.");
+
         this.user = user;
+    }
+
+    public void removeUser() {
+        this.user = null;
     }
 
     public User getUser() {
