@@ -108,18 +108,26 @@ public class Reactor<T> implements Server<T> {
         @SuppressWarnings("unchecked")
         NonBlockingConnectionHandler<T> handler = (NonBlockingConnectionHandler<T>) key.attachment();
 
-	// TODO: TEST
-	System.out.println("Handling ReadWrite");
-	// TODO: TEST
+        // TODO: TEST
+        System.out.println("Handling ReadWrite");
+        // TODO: TEST
 
         if (key.isReadable()) {
             Runnable task = handler.continueRead();
             if (task != null) {
+                // TODO: TEST
+                System.out.println("Submitting task");
+                // TODO: TEST
+
                 pool.submit(handler, task);
             }
         }
 
 	    if (key.isValid() && key.isWritable()) {
+            // TODO: TEST
+            System.out.println("Handling Write");
+            // TODO: TEST
+
             handler.continueWrite();
         }
     }

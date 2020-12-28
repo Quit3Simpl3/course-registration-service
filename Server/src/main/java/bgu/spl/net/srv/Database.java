@@ -28,6 +28,8 @@ public class Database {
 	}
 
 	public void userLogin(String clientId, String username, String password) throws Exception {
+		System.out.println("username.length() = " + username.length());
+
 		User user = this.getUser(username);
 		if (user.login(password)) {
 			this.Clients().get(clientId).setUser(user);
@@ -59,15 +61,28 @@ public class Database {
 
 	public User createUser(String username, String password, boolean isAdmin) {
 		User user = new User(username, password, isAdmin);
+
+		System.out.println("Adding user to DB: " + username);
+		System.out.println("user = " + user);
+
 		if (!Objects.isNull(this.users.putIfAbsent(username, user))) // If user doesn't exists, HashMap returns null
 			throw new IllegalArgumentException("This user already exists.");
+
+		System.out.println("createUser(): users.get(username) = " + users.get(username));
+
 		return user;
 	}
 
 	public User getUser(String username) {
 		User user = this.users.get(username);
+
+		System.out.println("users.size() = " + users.size());
+		System.out.println("users.keySet() = " + users.keySet());
+		System.out.println("users.get(username) = " + users.get(username));
+		System.out.println("user = " + user);
+
 		if (Objects.isNull(user))
-			throw new IllegalArgumentException("User " + username + " does not exist.");
+			throw new IllegalArgumentException("User '" + username + "' does not exist.");
 
 		return user;
 	}

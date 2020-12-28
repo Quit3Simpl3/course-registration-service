@@ -34,7 +34,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         catch (IllegalArgumentException e) {
             return error(msg_opcode);
         }
-        return ack(1);
+        return ack(msg_opcode);
     }
 
     private boolean isAdmin() {
@@ -69,6 +69,12 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 3, // "LOGIN"
                 (words)->{
                     String username = (String) words.get(0);
+
+                    // TODO: TEST
+                    System.out.println("username.length() is " + username.length());
+                    // TODO: TEST
+
+
                     String password = (String) words.get(1);
                     try {
                         // userLogin handles whether the user is already logged-in,
@@ -76,6 +82,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         database.userLogin(this.clientId, username, password);
                     }
                     catch (Exception e) {
+                        System.out.println(e.getMessage());
                         return error(3);
                     }
                     return ack(3);
@@ -89,6 +96,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         this.database.logoutUser(this.clientId);
                     }
                     catch (Exception e) {
+                        System.out.println(e.getMessage());
                         error(4);
                     }
                     return ack(4);
@@ -259,7 +267,8 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
 
     public Message process(Message msg) {
         // TODO
-        System.out.println("msg: " + msg);
+        System.out.println("PROTOCOL: opcode received: " + msg.getOpcode());
+        System.out.println("PROTOCOL: words received: " + msg.getWords().toString());
         // TODO
 
         int opcode = msg.getOpcode();

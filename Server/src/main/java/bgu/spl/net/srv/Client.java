@@ -13,6 +13,10 @@ public class Client {
     }
 
     public Client(String id) {
+        // TODO: TEST
+        System.out.println("Creating Client: " + id);
+        // TODO: TEST
+
         this.id = id;
         this.user = null;
     }

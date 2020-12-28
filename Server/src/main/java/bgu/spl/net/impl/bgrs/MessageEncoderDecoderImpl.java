@@ -34,36 +34,40 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         // TODO: TEST
 
         if (nextByte == '\0') {
+            System.out.println("Here 1");
             this.zeros_counter--;
 
-            // TODO: TEST
-            System.out.println("this.zeros_counter = " + this.zeros_counter);
-            // TODO: TEST
+            if (this.zeros_counter <= 0) {
+                // TODO: TEST
+                System.out.println("this.zeros_counter <= 0");
+                // TODO: TEST
+                Message message = new TwoStringsMessage(
+                        this.opcode,
+                        new String(this.firstWord, 0, this.first_len, StandardCharsets.UTF_8),
+                        new String(this.secondWord, 0, this.second_len, StandardCharsets.UTF_8)
+                );
+                System.out.println(message.getWords());
+                System.out.println("words[0].length() = " + ((String)message.getWords().get(0)).length());
+                this.first_len = 0;
+                this.second_len = 0;
+                this.len = 0;
+                return message;
+            }
         }
-        if (this.zeros_counter == 2) { // First word
+        else if (this.zeros_counter == 2) { // First word
+            System.out.println("Here 2");
             if (this.first_len >= firstWord.length) {
                 firstWord = Arrays.copyOf(firstWord, this.first_len * 2);
             }
             this.firstWord[this.first_len++] = nextByte;
+            System.out.println("first_len = " + first_len);
         }
         else if (this.zeros_counter == 1) { // Second word
+            System.out.println("Here 3");
             if (this.second_len >= secondWord.length) {
                 secondWord = Arrays.copyOf(secondWord, this.second_len * 2);
             }
             this.secondWord[this.second_len++] = nextByte;
-        }
-        else if (this.zeros_counter <= 0) {
-            // TODO: TEST
-            System.out.println("this.zeros_counter <= 0");
-            // TODO: TEST
-
-            this.first_len = 0;
-            this.second_len = 0;
-            return new TwoStringsMessage(
-                    this.opcode,
-                    new String(this.firstWord, 0, this.first_len, StandardCharsets.UTF_8),
-                    new String(this.secondWord, 0, this.second_len, StandardCharsets.UTF_8)
-            );
         }
         return null;
     }
@@ -132,28 +136,24 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             System.out.println("opcode = "+opcode);
             // TODO: TEST
 
-            if (opcode == 1 || opcode == 2)
-                this.zeros_counter = 2; // Two '\0's for a two-string message
-            else if (opcode == 8) // TODO: Not necessary. It just finishes after the first '\0'
-                this.zeros_counter = 1;
-        }
-        else {
-            if (opcode == 1 /*ADMINREG*/ || opcode == 2 /*STUDENTREG*/ || opcode == 3 /*LOGIN*/) { // Two string messages
-                return decodeTwoStringMessage(nextByte);
-            }
-            else if (opcode == 5 /*COURSEREG*/ || opcode == 6 /*KDAMCHECK*/ || opcode == 7 /*COURSESTAT*/ || opcode == 9 /*ISREGISTERED*/ || opcode == 10 /*UNREGISTER*/) {
-                return decodeOneIntegerMessage(nextByte);
-            }
-            else if (opcode == 8 /*STUDENTSTAT*/) {
-                return decodeOneStringMessage(nextByte);
-            }
-            else if (opcode == 4 /*LOGOUT*/ || opcode == 11 /*MYCOURSES*/) {
+            if (opcode == 4 /*LOGOUT*/ || opcode == 11 /*MYCOURSES*/) {
                 return decodeNoParameterMessage(nextByte);
             }
-            else {
+
+            this.zeros_counter = 2; // Two '\0's for a two-string message
+        }
+        else if (this.len >= 2) {
+            if (opcode == 1 /*ADMINREG*/ || opcode == 2 /*STUDENTREG*/ || opcode == 3 /*LOGIN*/) { // Two string messages
+                return decodeTwoStringMessage(nextByte);
+            } else if (opcode == 5 /*COURSEREG*/ || opcode == 6 /*KDAMCHECK*/ || opcode == 7 /*COURSESTAT*/ || opcode == 9 /*ISREGISTERED*/ || opcode == 10 /*UNREGISTER*/) {
+                return decodeOneIntegerMessage(nextByte);
+            } else if (opcode == 8 /*STUDENTSTAT*/) {
+                return decodeOneStringMessage(nextByte);
+            } else {
                 throw new IllegalArgumentException("Unknown opcode provided.");
             }
         }
+
         return null;
     }
 
@@ -178,7 +178,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             text = "";
         }
 
-        byte[] response = new byte[5 + text.length()];
+        byte[] response = new byte[4 + text.length()];
 
         byte[] opcode = shortToBytes((short)msg.getOpcode());
         byte[] msg_opcode = shortToBytes((short)msg.getMessageOpcode());
@@ -190,29 +190,21 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
         byte[] textBytes = text.getBytes();
 
-        for (int i = 0; i < textBytes.length; i++) {
-            response[i + 4] = textBytes[i];
+        if (textBytes.length > 0) {
+            for (int i = 0; i < textBytes.length; i++) {
+                response[i + 4] = textBytes[i];
+            }
+            response[3 + textBytes.length] = '\0'; // Mark the end of the string
         }
-        response[3 + textBytes.length] = '\0'; // Mark the end of the string
+
+        // TODO: TEST
+        System.out.print("Encoded response as: ");
+        for (int i = 0; i < response.length; i++)
+            System.out.print(response[i] + ", ");
+
+        System.out.println();
+        // TODO: TEST
 
         return response;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

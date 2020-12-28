@@ -33,9 +33,9 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     }
 
     public Runnable continueRead() {
-	// TODO
-	System.out.println("continueRead()");
-	// TODO
+        // TODO: TEST
+        System.out.println("continueRead()");
+        // TODO: TEST
 
         ByteBuffer buf = leaseBuffer();
 
@@ -54,20 +54,11 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                     while (buf.hasRemaining()) {
                         byte nextByte = buf.get();
                         T nextMessage = encdec.decodeNextByte(nextByte);
-
-                        // TODO
-                        System.out.println("nextMessage: " + nextMessage);
-                        // TODO
-
                         if (nextMessage != null) {
                             T response = protocol.process(nextMessage);
-
-                            // TODO
-                            System.out.println("response: " + response);
-                            // TODO
-
                             if (response != null) {
                                 writeQueue.add(ByteBuffer.wrap(encdec.encode(response)));
+
                                 reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                             }
                         }
