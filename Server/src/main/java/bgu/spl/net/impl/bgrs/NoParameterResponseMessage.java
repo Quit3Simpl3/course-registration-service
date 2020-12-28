@@ -1,10 +1,11 @@
 package bgu.spl.net.impl.bgrs;
 
 import bgu.spl.net.api.Message;
+import bgu.spl.net.api.ResponseMessage;
 
 import java.util.List;
 
-public class NoParameterResponseMessage implements Message<String> {
+public class NoParameterResponseMessage implements ResponseMessage {
     private final int opcode;
     private final int messageOpcode;
 

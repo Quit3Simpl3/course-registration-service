@@ -29,10 +29,18 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message<String> decodeTwoStringMessage(byte nextByte) {
+        // TODO: TEST
+        System.out.println("decodeTwoStringMessage");
+        // TODO: TEST
+
         if (nextByte == '\0') {
             this.zeros_counter--;
+
+            // TODO: TEST
+            System.out.println("this.zeros_counter = " + this.zeros_counter);
+            // TODO: TEST
         }
-        else if (this.zeros_counter == 2) { // First word
+        if (this.zeros_counter == 2) { // First word
             if (this.first_len >= firstWord.length) {
                 firstWord = Arrays.copyOf(firstWord, this.first_len * 2);
             }
@@ -45,6 +53,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             this.secondWord[this.second_len++] = nextByte;
         }
         else if (this.zeros_counter <= 0) {
+            // TODO: TEST
+            System.out.println("this.zeros_counter <= 0");
+            // TODO: TEST
+
             this.first_len = 0;
             this.second_len = 0;
             return new TwoStringsMessage(
@@ -57,6 +69,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message<String> decodeOneStringMessage(byte nextByte) {
+        // TODO: TEST
+        System.out.println("decodeOneStringMessage");
+        // TODO: TEST
+
         if (nextByte == '\0') {
             this.first_len = 0;
             return new OneStringMessage(
@@ -72,6 +88,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message<Integer> decodeOneIntegerMessage(byte nextByte) {
+        // TODO: TEST
+        System.out.println("decodeOneIntegerMessage");
+        // TODO: TEST
+
         if (len == 2) {
             this.len = 0;
             return new OneIntegerMessage(this.opcode, (int) byteToShort(this.bytes));
@@ -97,13 +117,13 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     public Message decodeNextByte(byte nextByte) {
         // TODO: TEST
         System.out.println("decodeNextByte(" + nextByte + ")");
-        System.out.println("len = " + len);
         // TODO: TEST
 
         if (len == 0) {
             this.len++;
         }
         else if (this.len == 1) { // First two bytes represent the opcode
+            this.len++;
 
             opcode_bytes[1] = nextByte;
             this.opcode = byteToShort(opcode_bytes); // Set opcode
@@ -154,7 +174,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         try {
             text = (String) msg.getWords().get(0);
         }
-        catch (NoSuchElementException e) {
+        catch (NullPointerException e) {
             text = "";
         }
 
