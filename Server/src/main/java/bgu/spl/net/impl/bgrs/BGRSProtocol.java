@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.bgrs;
 
+import bgu.spl.net.api.Message;
 import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.srv.Client;
 import bgu.spl.net.srv.Course;
@@ -12,21 +13,21 @@ import java.util.function.Function;
 
 import static java.lang.Integer.parseInt;
 
-public class BGRSProtocol implements MessagingProtocol<String> {
+public class BGRSProtocol implements MessagingProtocol<Message> {
     // Private fields:
-    final HashMap<Integer, Function<String[], String>> messageHandlers; // messageHandlers<opcode, function>
+    final HashMap<Integer, Function<List, Message<String>>> messageHandlers; // messageHandlers<opcode, function>
     Database database;
     String clientId;
 
-    private void addMessageHandler(int opcode, Function<String[], String> function) {
+    private void addMessageHandler(int opcode, Function<List, Message<String>> function) {
         this.messageHandlers.put(opcode, function);
     }
 
-    private Function<String[], String> getHandler(int opcode) {
+    private Function<List, Message<String>> getHandler(int opcode) {
         return this.messageHandlers.get(opcode);
     }
 
-    private String createUser(int msg_opcode, String username, String password, boolean isAdmin) {
+    private Message<String> createUser(int msg_opcode, String username, String password, boolean isAdmin) {
         try {
             database.createUser(username, password, isAdmin);
         }
@@ -49,9 +50,8 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 1, // "ADMINREG"
                 (words)->{
-                    // words[1] = username, words[2] = password
-                    String username = words[1];
-                    String password = words[2];
+                    String username = (String) words.get(0);
+                    String password = (String) words.get(1);
 
                     return createUser(1, username, password, true);
                 }
@@ -59,9 +59,8 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 2, // "STUDENTREG"
                 (words)->{
-                    // words[1] = username, words[2] = password
-                    String username = words[0];
-                    String password = words[1];
+                    String username = (String) words.get(0);
+                    String password = (String) words.get(1);
 
                     return createUser(2, username, password, false);
                 }
@@ -69,9 +68,8 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 3, // "LOGIN"
                 (words)->{
-                    // words[1] = username, words[2] = password
-                    String username = words[1];
-                    String password = words[2];
+                    String username = (String) words.get(0);
+                    String password = (String) words.get(1);
                     try {
                         // userLogin handles whether the user is already logged-in,
                         // setUser handles whether this client already logged-in with a different user.
@@ -99,9 +97,9 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 5, // "COURSEREG"
                 (words)->{
-                    String courseNum = words[1];
+                    int courseNum = (int)words.get(0);
                     try {
-                        Course course = database.Courses().getCourse(parseInt(courseNum));
+                        Course course = database.Courses().getCourse(courseNum);
                         database.Courses().register(course, database.Clients().get(this.clientId).getUser());
                     }
                     catch (Exception e) {
@@ -113,9 +111,9 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 6, // "KDAMCHECK"
                 (words)->{
-                    String courseNum = words[1];
+                    int courseNum = (int)words.get(0);
                     try {
-                        Course course = database.Courses().getCourse(parseInt(courseNum));
+                        Course course = database.Courses().getCourse(courseNum);
 
                         return ack(6, course.getKdam().toString());
                     }
@@ -127,12 +125,12 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 7, // "COURSESTAT" // Admin only!
                 (words)->{
-                    String courseNum = words[1];
+                    int courseNum = (int)words.get(0);
                     try {
                         if (!this.isAdmin())
                             throw new IllegalArgumentException("Admin privileges required.");
 
-                        Course course = database.Courses().getCourse(parseInt(courseNum));
+                        Course course = database.Courses().getCourse(courseNum);
                         String courseName = course.getName();
                         int freeSeats = course.getAvailableSeats();
                         int maxSeats = course.getMaxStudents();
@@ -161,7 +159,7 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 8, // "STUDENTSTAT" // Admin Only!
                 (words)->{
-                    String username = words[1];
+                    String username = (String)words.get(0);
                     try {
                         if (!this.isAdmin())
                             throw new IllegalArgumentException("Admin privileges required.");
@@ -185,9 +183,9 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 9, // "ISREGISTERED
                 (words)->{
-                    String courseNumber = words[1];
+                    int courseNum = (int)words.get(0);
                     try {
-                        Course course = database.Courses().getCourse(parseInt(courseNumber));
+                        Course course = database.Courses().getCourse(courseNum);
                         if (database.Courses().isStudentRegistered(
                                 database.Clients().get(this.clientId).getUser(),
                                 course))
@@ -203,8 +201,8 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         this.addMessageHandler(
                 10, // "UNREGISTER"
                 (words)->{
-                    String courseNumber = words[1];
-                    Course course = database.Courses().getCourse(parseInt(courseNumber));
+                    int courseNum = (int)words.get(0);
+                    Course course = database.Courses().getCourse(courseNum);
                     try {
                         User user = database.Clients().get(this.clientId).getUser();
                         if (database.Courses().unregister(course, user))
@@ -234,41 +232,43 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         ch = new char[] {'h', 'i'}; // TODO: IMPLEMENT
     }
 
-    private String respond(int opcode, int msg_opcode, String response) {
+    private Message<String> respond(int opcode, int msg_opcode, String response) {
         char[] ch_opcode = new char[2];
         char[] ch_msg_opcode = new char[2];
         shortToByte(ch_opcode, (short)13);
         shortToByte(ch_msg_opcode, (short)msg_opcode);
-        if (response.length() > 0)
-            return Arrays.toString(ch_opcode) + "\0" + Arrays.toString(ch_msg_opcode) + "\0" + response;
-        return Arrays.toString(ch_opcode) + "\0" + Arrays.toString(ch_msg_opcode);
+        if (response.length() > 0) {
+            return new OneStringResponseMessage(opcode, msg_opcode, response);
+        }
+        else {
+            return new NoParameterResponseMessage(opcode, msg_opcode);
+        }
     }
 
-    private String ack(int msg_opcode) {
+    private Message ack(int msg_opcode) {
         return ack(msg_opcode, "");
     }
 
-    private String ack(int msg_opcode, String response) { // ACK OPCODE = 12
+    private Message ack(int msg_opcode, String response) { // ACK OPCODE = 12
         return respond(12, msg_opcode, response);
     }
 
-    private String error(int msg_opcode) { // ERROR OPCODE = 13
+    private Message error(int msg_opcode) { // ERROR OPCODE = 13
         return respond(13, msg_opcode, "");
     }
 
-    @Override
-    public String process(String msg) {
+    public Message process(Message msg) {
         // TODO
         System.out.println("msg: " + msg);
         // TODO
 
-        String opcode = msg.substring(0, 1); // Get the 4 digit opcode
-        String[] words = (msg.substring(2)).split(" ");
+        int opcode = msg.getOpcode();
+        List words = msg.getWords();
 
-        Function<String[], String> func = this.getHandler(parseInt(opcode)); // Try getting the command by its opcode
+        Function<List, Message<String>> func = this.getHandler(opcode); // Try getting the command by its opcode
 
         if (Objects.isNull(func))
-            return error(parseInt(opcode));
+            return error(opcode);
 
         return func.apply(words);
     }
