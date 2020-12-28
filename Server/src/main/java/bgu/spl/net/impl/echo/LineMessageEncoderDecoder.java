@@ -21,9 +21,25 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         return null; //not a line yet
     }
 
+    private byte[] shortToBytes(short num)
+    {
+        byte[] bytesArr = new byte[2];
+        bytesArr[0] = (byte)((num >> 8) & 0xFF);
+        bytesArr[1] = (byte)(num & 0xFF);
+        return bytesArr;
+    }
+
     @Override
     public byte[] encode(String message) {
-        return (message + "\n").getBytes(); //uses utf8 by default
+        byte[] msg = new byte[2+message.getBytes().length];
+        byte[] opcode = shortToBytes((short) 5);
+        msg[0] = opcode[0];
+        msg[1] = opcode[1];
+        for (int i = 0; i < message.getBytes().length; i++) {
+            msg[i+2] = message.getBytes()[i];
+        }
+        return msg;
+//        return (message).getBytes(); //uses utf8 by default
     }
 
     private void pushByte(byte nextByte) {

@@ -53,11 +53,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                 try {
                     while (buf.hasRemaining()) {
                         byte nextByte = buf.get();
-
-                        // TODO
-                        System.out.println("nextByte : " + nextByte);
-                        // TODO
-
                         T nextMessage = encdec.decodeNextByte(nextByte);
 
                         // TODO

@@ -5,8 +5,8 @@ import bgu.spl.net.api.Message;
 import java.util.List;
 
 public class NoParameterResponseMessage implements Message<String> {
-    private int opcode;
-    private int messageOpcode;
+    private final int opcode;
+    private final int messageOpcode;
 
     public NoParameterResponseMessage(int opcode, int messageOpcode) {
         this.opcode = opcode;

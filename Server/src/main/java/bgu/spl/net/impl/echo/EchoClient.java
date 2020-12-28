@@ -19,13 +19,14 @@ public class EchoClient {
         }
 
         //BufferedReader and BufferedWriter automatically using UTF-8 encoding
-        try (Socket sock = new Socket(args[0], 8888);
+        try (Socket sock = new Socket(args[0], 7777);
                 BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()))) {
 
             System.out.println("sending message to server");
-            out.write(args[1]);
-            out.newLine();
+            LineMessageEncoderDecoder enc = new LineMessageEncoderDecoder();
+            out.write(enc.encode(args[1]).toString().toCharArray());
+//            out.newLine();
             out.flush();
 
             System.out.println("awaiting response");

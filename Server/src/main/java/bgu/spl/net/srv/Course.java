@@ -5,8 +5,6 @@ package bgu.spl.net.srv;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,9 +26,7 @@ public class Course {
         this.freeSeats = new AtomicInteger(numOfMaxStudents);
         this.students = new ConcurrentHashMap<>();
         this.name = name;
-
-        this.kdam = new ArrayList<>();
-        Collections.copy(this.kdam, kdam); // Deep-copy (clone) the argument
+        this.kdam = new ArrayList<>(kdam);
     }
 
     public List<Integer> getKdam() {

@@ -81,6 +81,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message decodeNoParameterMessage(byte nextByte) {
+        // TODO: TEST
+        System.out.println("decodeNoParameterMessage");
+        // TODO: TEST
+
         if (len == 2) {
             this.len = 0;
             return new OneIntegerMessage(this.opcode, (int) byteToShort(this.bytes));
@@ -91,12 +95,23 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
     @Override
     public Message decodeNextByte(byte nextByte) {
+        // TODO: TEST
+        System.out.println("decodeNextByte(" + nextByte + ")");
+        System.out.println("len = " + len);
+        // TODO: TEST
+
         if (len == 0) {
             this.len++;
         }
         else if (this.len == 1) { // First two bytes represent the opcode
+
             opcode_bytes[1] = nextByte;
             this.opcode = byteToShort(opcode_bytes); // Set opcode
+
+            // TODO: TEST
+            System.out.println("opcode = "+opcode);
+            // TODO: TEST
+
             if (opcode == 1 || opcode == 2)
                 this.zeros_counter = 2; // Two '\0's for a two-string message
             else if (opcode == 8) // TODO: Not necessary. It just finishes after the first '\0'
