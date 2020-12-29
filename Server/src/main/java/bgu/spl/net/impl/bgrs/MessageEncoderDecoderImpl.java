@@ -47,7 +47,15 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Function<Byte, Message> getMessageDecoder(int opcode) {
-        return this.decodeMessageByOpcode[opcode - 1];
+        try {
+            return this.decodeMessageByOpcode[opcode - 1];
+        }
+        catch (NoSuchElementException e) {
+            // TODO
+            System.out.print(e.getMessage());
+            // TODO
+            throw new IllegalArgumentException("Unknown opcode provided.");
+        }
     }
 
     private short byteToShort(byte[] byteArr) {
@@ -62,7 +70,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         // TODO: TEST
 
         if (nextByte == '\0') {
-            System.out.println("Here 1");
             this.zeros_counter--;
 
             if (this.zeros_counter <= 0) {
@@ -74,8 +81,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                         new String(this.firstWord, 0, this.first_len, StandardCharsets.UTF_8),
                         new String(this.secondWord, 0, this.second_len, StandardCharsets.UTF_8)
                 );
-                System.out.println(message.getWords());
-                System.out.println("words[0].length() = " + ((String)message.getWords().get(0)).length());
                 this.first_len = 0;
                 this.second_len = 0;
                 this.len = 0;
@@ -83,22 +88,39 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             }
         }
         else if (this.zeros_counter == 2) { // First word
-            System.out.println("Here 2");
-            if (this.first_len >= firstWord.length) {
-                firstWord = Arrays.copyOf(firstWord, this.first_len * 2);
-            }
-            this.firstWord[this.first_len++] = nextByte;
-            System.out.println("first_len = " + first_len);
+            /*firstWord = getSizeableArray(firstWord, this.first_len); // Handle the byte-array's length
+            this.firstWord[this.first_len++] = nextByte;*/
+            this.first_len = addAndGetByteArray(this.firstWord, nextByte, this.first_len); // TODO: MAKE SURE THIS UPDATES THE ARRAY!!!
         }
         else if (this.zeros_counter == 1) { // Second word
-            System.out.println("Here 3");
-            if (this.second_len >= secondWord.length) {
-                secondWord = Arrays.copyOf(secondWord, this.second_len * 2);
-            }
-            this.secondWord[this.second_len++] = nextByte;
+            /*secondWord = getSizeableArray(secondWord, this.second_len); // Handle the byte-array's length
+            this.secondWord[this.second_len++] = nextByte;*/
+            this.second_len = addAndGetByteArray(this.secondWord, nextByte, this.second_len); // TODO: MAKE SURE THIS UPDATES THE ARRAY!!!
         }
         return null;
     }
+
+    /**
+     * Adds the provided element to the provided byte array and returns the next element's location.
+     * Updates the array's length as needed.
+     * @param byteArray - The byte-array to update.
+     * @param element - The element to add to the array.
+     * @param location - Where to put the element.
+     * @return - The location of the next element.
+     */
+    private int addAndGetByteArray(byte[] byteArray, byte element, int location) {
+        if (location >= byteArray.length) // Handle the array's length
+            byteArray = Arrays.copyOf(byteArray, location * 2);
+
+        byteArray[location++] = element;
+        return location;
+    }
+
+    /*private byte[] getSizeableArray(byte[] byteArray, int length) {
+        if (length >= byteArray.length)
+            return Arrays.copyOf(byteArray, length * 2);
+        return byteArray;
+    }*/
 
     private Message<String> decodeOneStringMessage(byte nextByte) {
         // TODO: TEST
