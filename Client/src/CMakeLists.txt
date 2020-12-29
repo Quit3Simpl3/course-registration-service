@@ -6,4 +6,4 @@ project(spl-03)
 
 
 # add the executable
-add_executable(spl-03 echoClient.cpp)
+add_executable(spl-03 client.cpp)

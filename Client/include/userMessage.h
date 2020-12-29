@@ -10,7 +10,7 @@ class userMessage {
 
     public:
 
-        userMessage(ConnectionHandler* handler,bool* t);
+        userMessage(ConnectionHandler* handler,bool* terminate, bool* logOut);
 
         void run();
 
@@ -21,7 +21,8 @@ class userMessage {
     private:
         ConnectionHandler* handler;
         bool* terminate;
-        std::map<std::string, void (*)(char a[],std::vector<string>,ConnectionHandler* h)> my_map;
+        bool* logOut;
+        std::map<std::string, void (*)(char a[],std::vector<string>,ConnectionHandler* h, bool* logOut)> my_map;
 
 
 

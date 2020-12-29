@@ -5,12 +5,12 @@
 
 using namespace std;
 
-void ACK(char a[],ConnectionHandler* h,bool* terminate);
-void ERROR(char a[],ConnectionHandler* h,bool* terminate);
+void ACK(char a[],ConnectionHandler* h,bool* terminate,bool* l);
+void ERROR(char a[],ConnectionHandler* h,bool* terminate,bool* l);
 short bytesToShort(char* bytesAr);
 
-serverMessage::serverMessage(ConnectionHandler *h, bool* t) : handler(h),terminate(t){
-    my_map = std::map<int, void (*)(char a[],ConnectionHandler* h,bool* terminate)>();
+serverMessage::serverMessage(ConnectionHandler *h, bool* t,bool* l) : handler(h),terminate(t), logOut(l){
+    my_map = std::map<int, void (*)(char a[],ConnectionHandler* h,bool* terminate,bool* l)>();
     my_map[12] = ACK;
     my_map[13] = ERROR;
 }
@@ -23,21 +23,23 @@ void serverMessage::run() {
 
         cout << "Received from server: " << opCodeNum << endl; // TODO
 
-        (my_map.at(opCodeNum))(opCode, handler, terminate);
+        (my_map.at(opCodeNum))(opCode, handler, terminate,logOut);
         delete[] opCode;
     }
 }
-void ERROR(char a[], ConnectionHandler* h, bool* terminate){
+void ERROR(char a[], ConnectionHandler* h, bool* terminate,bool* l){
     string outPut = "ERROR";
     h->getBytes(a,2);
     short messageNum = bytesToShort(a);
+    if (messageNum == 4)
+        *l = false;
     outPut += " " + to_string(messageNum);
 
     cout << "Received error from server" << endl; // TODO
 
     cout << outPut << endl;
 }
-void ACK(char a[],ConnectionHandler* h,bool* terminate) {
+void ACK(char a[],ConnectionHandler* h,bool* terminate,bool* l) {
     string outPut = "ACK";
 
     char messageOpCode[2];
