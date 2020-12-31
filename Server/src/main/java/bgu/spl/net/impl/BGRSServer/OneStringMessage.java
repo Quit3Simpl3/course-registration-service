@@ -15,10 +15,8 @@ public class OneStringMessage implements Message<String> {
     }
 
     @Override
-    public List<String> getWords() {
-        List<String> wordList = new ArrayList<>(1);
-        wordList.add(this.word);
-        return wordList;
+    public String getResponse() {
+        return this.word;
     }
 
     public void setWords(String word) {
