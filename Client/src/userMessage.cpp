@@ -2,6 +2,9 @@
 #include "../include/connectionHandler.h"
 #include "../include/userMessage.h"
 #include <boost//algorithm//string.hpp>
+//#include "../src/serverMessage.cpp"
+
+
 
 using namespace std;
 
@@ -48,11 +51,6 @@ void userMessage::run() {
     }
 }
 
-short bytesToShort1(char* bytesAr) {
-    short result = (short)((bytesAr[0] & 0xff)<<8);
-    result += (short)(bytesAr[1] & 0xff);
-    return result;
-}
 
 void sendShort(char a[], char shortMsg[], ConnectionHandler* h) {
     char *charToSend = new char[4];
@@ -74,8 +72,8 @@ void sendShort(char a[], char shortMsg[], ConnectionHandler* h) {
     w2[1] = charToSend[3];
 
 
-    short w01 = bytesToShort1(w1);
-    short w02 = bytesToShort1(w2);
+    short w01 = bytesToShort(w1);
+    short w02 = bytesToShort(w2);
 
     cout << "the opcode is:" << w01 << ", ";
     cout << "the message is:" << w02 << ". ";
@@ -112,8 +110,8 @@ void stringToBytes(char a[], string line, int size, ConnectionHandler* h) {
     w2[3] = lineToSend[3];
 
 
-    short w01 = bytesToShort1(w1);
-    short w02 = bytesToShort1(w2);
+    short w01 = bytesToShort(w1);
+    short w02 = bytesToShort(w2);
 
     cout << "the opcode is:" << w01 << ",";
     cout << "the msg is:" << w02 << ",";
@@ -167,17 +165,14 @@ void courseReg(char a[], std::vector<string> v, ConnectionHandler* h, bool* l) {
 
 void kdamCheck(char a[],std::vector<string> v, ConnectionHandler* h, bool* l) {
     shortToBytes(a, 6);
-    string send = v[1];
-    int len = send.length();
-    stringToBytes(a,send,len,h);
+    short send_short = stoi(v[1]);
+    char *msg = new char[2];
+    shortToBytes(msg, send_short);
+    cout << "send_short = " << send_short << endl;
+    sendShort(a, msg, h);
 }
 
 void courseStat(char a[],std::vector<string> v, ConnectionHandler* h, bool* l) {
-    /*shortToBytes(a, 7);
-    string send = v[1];
-    int len = send.length();
-    stringToBytes(a,send,len,h);*/
-
     shortToBytes(a, 7);
     short send_short = stoi(v[1]);
     char *msg = new char[2];
@@ -195,16 +190,20 @@ void studentStat(char a[],std::vector<string> v, ConnectionHandler* h, bool* l) 
 
 void isRegistered(char a[],std::vector<string> v, ConnectionHandler* h, bool* l) {
     shortToBytes(a, 9);
-    string send = v[1];
-    int len = send.length();
-    stringToBytes(a,send,len,h);
+    short send_short = stoi(v[1]);
+    char *msg = new char[2];
+    shortToBytes(msg, send_short);
+    cout << "send_short = " << send_short << endl;
+    sendShort(a, msg, h);
 }
 
 void unRegister(char a[],std::vector<string> v,ConnectionHandler* h,bool* l) {
     shortToBytes(a, 10);
-    string send = v[1];
-    int len = send.length();
-    stringToBytes(a,send,len,h);
+    short send_short = stoi(v[1]);
+    char *msg = new char[2];
+    shortToBytes(msg, send_short);
+    cout << "send_short = " << send_short << endl;
+    sendShort(a, msg, h);
 }
 void myCourses(char a[],std::vector<string> v,ConnectionHandler* h,bool* l) {
     shortToBytes(a, 11);

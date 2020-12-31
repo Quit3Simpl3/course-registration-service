@@ -52,10 +52,44 @@ void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
     if (messageNum == 4) {
         *terminate = true;
     }
-    if (((messageNum >= 6) & (messageNum <= 9)) | (messageNum == 11)){
-         outPut += " ";
+    if (messageNum == 6) {
+        outPut += '\n';
+        outPut += "Kdam Courses: ";
          h->getLine(outPut);
     }
+    if (messageNum == 7) {
+        outPut += '\n';
+        outPut += "Course: ";
+        h->getLine(outPut);
+        outPut += '\n';
+        outPut += "Seats Available: ";
+        h->getLine(outPut);
+        outPut += '\n';
+        outPut += "Students Registered: ";
+        h->getLine(outPut);
+    }
+
+    if (messageNum == 8) {
+        outPut += '\n';
+        outPut += "Student: ";
+        h->getLine(outPut);
+        outPut += '\n';
+        outPut += "Courses: ";
+        h->getLine(outPut);
+    }
+
+    if (messageNum == 9) {
+        outPut += '\n';
+        h->getLine(outPut);
+    }
+    if (messageNum == 11) {
+        outPut += '\n';
+        outPut += "My Courses: ";
+        h->getLine(outPut);
+    }
+
+
+
     cout << outPut << endl;
 }
 
