@@ -9,8 +9,8 @@ void ACK(char a[],ConnectionHandler* h,bool* terminate,bool* l);
 void ERROR(char a[],ConnectionHandler* h,bool* terminate,bool* l);
 short bytesToShort(char* bytesAr);
 
-serverMessage::serverMessage(ConnectionHandler *h, bool* t,bool* l) : handler(h),terminate(t), logOut(l){
-    my_map = std::map<int, void (*)(char a[],ConnectionHandler* h,bool* terminate,bool* l)>();
+serverMessage::serverMessage(ConnectionHandler *h, bool* t, bool* l) : handler(h), terminate(t), logOut(l){
+    my_map = std::map<int, void (*)(char a[], ConnectionHandler* h, bool* terminate, bool* l)>();
     my_map[12] = ACK;
     my_map[13] = ERROR;
 }
@@ -39,7 +39,7 @@ void ERROR(char a[], ConnectionHandler* h, bool* terminate,bool* l){
 
     cout << outPut << endl;
 }
-void ACK(char a[],ConnectionHandler* h,bool* terminate,bool* l) {
+void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
     string outPut = "ACK";
 
     char messageOpCode[2];
