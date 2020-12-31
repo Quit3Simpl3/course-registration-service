@@ -52,29 +52,51 @@ void userMessage::run() {
         }
     }
 }
+
+short bytesToShort(char* bytesAr) {
+    short result = (short)((bytesAr[0] & 0xff)<<8);
+    result += (short)(bytesAr[1] & 0xff);
+    return result;
+}
 void stringToBytes(char a[], string line, int size, ConnectionHandler* h) {
-    // char* lineToSend = new char[size+3];
+
     int line_size = size + 2;
-    char* lineToSend = new char[line_size];
+    char *lineToSend = new char[line_size];
 
     lineToSend[0] = a[0];
     lineToSend[1] = a[1];
 
-    for (int j = 2; j<line_size; j++) {
-        lineToSend[j] = line[j-2];
+    for (int j = 2; j < line_size; j++) {
+        lineToSend[j] = line[j - 2];
     }
 
-    h->sendBytes(lineToSend,line_size);
+    h->sendBytes(lineToSend, line_size);
 
     // TODO
     cout << "sent msg: START:";
-    for (int i = 0; i < line_size; i++) {
-        cout << lineToSend[i] << ",";
-    }
+
+    char *w1 = new char[2];
+    w1[0] = lineToSend[0];
+    w1[1] = lineToSend[1];
+    char *w2 = new char[2];
+    w2[2] = lineToSend[2];
+    w2[3] = lineToSend[3];
+
+
+    short w01 = bytesToShort(w1);
+    short w02 = bytesToShort(w2);
+
+    cout << "the opcode is:" << w01 << ",";
+    cout << "the msg is:" << w02 << ",";
     cout << "END." << endl;
 
     delete[] lineToSend;
+
+
 }
+
+
+
 void shortToBytes(char* bytesAr, short num) {
     bytesAr[0] = ((num >> 8) & 0xFF);
     bytesAr[1] = (num & 0xFF);
@@ -109,8 +131,12 @@ void logout(char a[],std::vector<string> v,ConnectionHandler* h,bool* l) {
 void courseReg(char a[],std::vector<string> v,ConnectionHandler* h,bool* l) {
     shortToBytes(a, 5);
     string send = v[1];
+    char *course = new char[2];
+    int courseNum = std:: stoi(send);
+    short num = courseNum;
+    shortToBytes(course, courseNum);
     int len = send.length();
-    stringToBytes(a,send,len,h);
+    stringToBytes(a,course,len,h);
 }
 
 void kdamCheck(char a[],std::vector<string> v,ConnectionHandler* h,bool* l) {
