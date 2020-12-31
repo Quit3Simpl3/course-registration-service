@@ -23,10 +23,11 @@ public class Courses {
     }
 
     private void addCourse(Course course) {
-        if (!Objects.isNull(this.courseIdToIndex.put(course.getCourseNumber(), this.courses.indexOf(course))))
+        if (this.courseIdToIndex.containsKey(course.getCourseNumber()))
             throw new IllegalArgumentException("This course already exists.");
 
         this.courses.add(course); // Adds the course to the courses list
+        this.courseIdToIndex.put(course.getCourseNumber(), this.courses.indexOf(course));
     }
 
     public void createCourse(int courseNumber, int numOfMaxStudents, String name, List<Integer> kdam) {
@@ -47,17 +48,37 @@ public class Courses {
     * @param id - The course's ID number.
      */
     public Course getCourse(int id) {
-        try {
+        for (Course course : this.courses) {
+            if (course.getCourseNumber() == id) {
+                return course;
+            }
+        }
+        return null;
+
+
+
+        /*// TODO: TEST
+        System.out.println("Courses.getCourse(" + id + ").");
+        System.out.println("courses.size() = " + courses.size());
+        // TODO: TEST
+
+        //try {
             Integer index = this.courseIdToIndex.get(id);
+
+        // TODO: TEST
+        System.out.println("courseIdToIndex = " + index + ".");
+        // TODO: TEST
+
             if (Objects.isNull(index)) // Course not found in HashMap // TODO: test this!!!
                 for (Course course : this.courses)
-                    if (course.getCourseNumber() == id) return course;
+                    if (course.getCourseNumber() == id)
+                        return course;
 
             return this.courses.get(index);
         }
         catch (NoSuchElementException e) {
             throw new NoSuchElementException("Course number " + id + " does not exist.");
-        }
+        }*/
     }
 
     /**

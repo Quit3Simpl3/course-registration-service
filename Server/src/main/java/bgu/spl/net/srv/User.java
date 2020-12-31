@@ -26,13 +26,25 @@ public class User {
         this.isLoggedIn = false;
     }
 
-    public boolean login(String password) throws Exception {
+    public void login(String password) throws Exception {
         // TODO: TEST
         System.out.println("Login as " + this.getUsername() + " with password " + password);
         // TODO: TEST
 
-        if (this.isLoggedIn()) // Check whether the user is already logged in
+        if (password.equals(this.password)) {
+            // TODO: TEST
+            System.out.println("Login successful.");
+            // TODO: TEST
+
+            this.isLoggedIn = (password.equals(this.password));
+        }
+        else {
+            throw new Exception("Wrong password.");
+        }
+
+        /*if (this.isLoggedIn()) {// Check whether the user is already logged in
             throw new Exception("The user is already logged in.");
+        }
         else {
             // TODO: TEST
             System.out.println("Login successful.");
@@ -40,7 +52,7 @@ public class User {
 
             this.isLoggedIn = (password.equals(this.password));
             return this.isLoggedIn();
-        }
+        }*/
     }
 
     public boolean logout() {

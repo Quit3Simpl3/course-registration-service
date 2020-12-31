@@ -1,4 +1,4 @@
-package bgu.spl.net.impl.bgrs;
+package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.Message;
 import bgu.spl.net.srv.Database;
@@ -6,14 +6,16 @@ import bgu.spl.net.srv.Reactor;
 import bgu.spl.net.srv.Server;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
-public class Main {
+public class ReactorMain {
     public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("You must supply two arguments: port, threads");
+            System.exit(1);
+        }
+
         Database database = Database.getInstance();
         int port = parseInt(args[0]);
         int threads = parseInt(args[1]);
@@ -22,7 +24,7 @@ public class Main {
                 port,
                 BGRSProtocol::new,
                 MessageEncoderDecoderImpl::new
-            )) {
+        )) {
             server.serve(); // Start the server reactor...
         }
         catch (IOException e) {

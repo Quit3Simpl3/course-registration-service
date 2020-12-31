@@ -33,8 +33,8 @@ public class Client {
     }
 
     public User getUser() {
-        if (Objects.isNull(user))
-            throw new IllegalStateException("User not set for this client.");
+//        if (Objects.isNull(user))
+//            throw new IllegalStateException("User not set for this client.");
         return this.user;
     }
 

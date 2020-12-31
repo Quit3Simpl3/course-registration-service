@@ -1,6 +1,5 @@
-package bgu.spl.net.impl.bgrs;
+package bgu.spl.net.impl.BGRSServer;
 
-import bgu.spl.net.api.Message;
 import bgu.spl.net.api.ResponseMessage;
 
 import java.util.List;

@@ -6,6 +6,7 @@ package bgu.spl.net.srv;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -65,8 +66,12 @@ public class Course {
     }
 
     public synchronized void register(User student) throws Exception {
+        if (Objects.isNull(student))
+            throw new NullPointerException("Student object is null");
         if (student.isAdmin()) // Check whether this user is an admin
             throw new IllegalArgumentException("Admins cannot register to courses.");
+        if (this.containsStudent(student)) // TODO: is this needed?
+            throw new IllegalArgumentException("Student " + student.getUsername() + " is already registered to course " + this.getCourseNumber());
 
         // Check if a seat is available:
         if (this.freeSeats.get() <= 0)
@@ -74,15 +79,20 @@ public class Course {
         else {
             // Update seat count:
             this.freeSeats.getAndDecrement();
-            // Check kdam courses:
-            for (int kdam_course : this.kdam) {
-                if (!(this.courses.getCourse(kdam_course)).containsStudent(student)) {
-                    this.freeSeats.getAndIncrement(); // Release the student's seat
-                    throw new Exception("The student isn't registered to all the kdam courses.");
+            // Check if student is already in this course:
+            if (this.containsStudent(student))
+                this.freeSeats.getAndIncrement(); // Release the student's seat
+            else { // Otherwise, continue with registration:
+                // Check kdam courses:
+                for (int kdam_course : this.kdam) {
+                    if (!(this.courses.getCourse(kdam_course)).containsStudent(student)) {
+                        this.freeSeats.getAndIncrement(); // Release the student's seat
+                        throw new Exception("The student isn't registered to all the kdam courses.");
+                    }
                 }
+                // Register student:
+                students.put(student.getUsername(), student);
             }
-            // Register student:
-            students.put(student.getUsername(), student);
         }
     }
 

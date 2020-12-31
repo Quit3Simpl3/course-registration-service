@@ -28,14 +28,20 @@ public class Database {
 	}
 
 	public void userLogin(String clientId, String username, String password) throws Exception {
-		System.out.println("username.length() = " + username.length());
-
 		User user = this.getUser(username);
-		if (user.login(password)) {
-			this.Clients().get(clientId).setUser(user);
+		User current_user = this.Clients().get(clientId).getUser();
+		if (!Objects.isNull(current_user)) {
+			if (current_user != user)
+				throw new Exception("Client already logged-in with a different user.");
+			else { // current_user == new_user
+				user.login(password);
+			}
 		}
-		else {
-			throw new Exception("Wrong password.");
+		else { // Client isn't logged-in
+			if (!user.isLoggedIn()) {
+				user.login(password);
+				this.Clients().get(clientId).setUser(user);
+			}
 		}
 	}
 
@@ -60,6 +66,8 @@ public class Database {
 	}
 
 	public User createUser(String username, String password, boolean isAdmin) {
+//		if ()
+
 		User user = new User(username, password, isAdmin);
 
 		System.out.println("Adding user to DB: " + username);
@@ -128,7 +136,11 @@ public class Database {
 		this.clients = Clients.getInstance();
 		this.users = new ConcurrentHashMap<>();
 
-		this.input_file_path = "./Courses.txt";
+		// TODO
+		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+// TODO
+
+		this.input_file_path = "../Courses.txt";
 		this.initialize(this._get_input_file_path());
 	}
 

@@ -56,6 +56,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                         T nextMessage = encdec.decodeNextByte(nextByte);
                         if (nextMessage != null) {
                             T response = protocol.process(nextMessage);
+
                             if (response != null) {
                                 writeQueue.add(ByteBuffer.wrap(encdec.encode(response)));
 

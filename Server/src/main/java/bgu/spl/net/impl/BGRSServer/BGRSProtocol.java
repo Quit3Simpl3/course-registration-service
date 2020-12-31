@@ -1,13 +1,11 @@
-package bgu.spl.net.impl.bgrs;
+package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.Message;
 import bgu.spl.net.api.MessagingProtocol;
-import bgu.spl.net.srv.Client;
 import bgu.spl.net.srv.Course;
 import bgu.spl.net.srv.Database;
 import bgu.spl.net.srv.User;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.function.Function;
 
@@ -69,12 +67,6 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 3, // "LOGIN"
                 (words)->{
                     String username = (String) words.get(0);
-
-                    // TODO: TEST
-                    System.out.println("username.length() is " + username.length());
-                    // TODO: TEST
-
-
                     String password = (String) words.get(1);
                     try {
                         // userLogin handles whether the user is already logged-in,
@@ -107,10 +99,19 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 (words)->{
                     int courseNum = (int)words.get(0);
                     try {
+                        System.out.println("COURSEREG: " + courseNum);
                         Course course = database.Courses().getCourse(courseNum);
+                        if (Objects.isNull(course))
+                            throw new IllegalArgumentException("Course " + courseNum + " does not exist.");
+
+                        // TODO
+                        System.out.println("course = " + course.getCourseNumber() + ", " + course.getName());
+                        // TODO
+
                         database.Courses().register(course, database.Clients().get(this.clientId).getUser());
                     }
                     catch (Exception e) {
+                        System.out.println(e.getMessage());
                         return error(5);
                     }
                     return ack(5);
@@ -134,7 +135,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 7, // "COURSESTAT" // Admin only!
                 (words)->{
                     int courseNum = (int)words.get(0);
-                    try {
+                    //try {
                         if (!this.isAdmin())
                             throw new IllegalArgumentException("Admin privileges required.");
 
@@ -156,12 +157,13 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                                         + courseName + "\0"
                                         + freeSeats + "\0"
                                         + maxSeats + "\0"
-                                        + studentNames.toString()
+                                        + studentNames.toString() + "\0"
                         );
-                    }
+                    /*}
                     catch (Exception e) {
+                        System.out.println(e.getMessage());
                         return error(7);
-                    }
+                    }*/
                 }
         );
         this.addMessageHandler(
@@ -181,9 +183,13 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         for (Course course : courses)
                             courseNames.add(course.getCourseNumber());
 
-                        return ack(8,student.getUsername() + "\0" + courseNames.toString());
+                        return ack(8,
+                                "Student: " + student.getUsername() + "\0"
+                                        + "Courses: " + courseNames.toString() + "\0"
+                        );
                     }
                     catch (Exception e) {
+                        System.out.println(e.getMessage());
                         return error(8);
                     }
                 }
@@ -236,15 +242,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         );
     }
 
-    private void shortToByte(char[] ch, short opcode) {
-        ch = new char[] {'h', 'i'}; // TODO: IMPLEMENT
-    }
-
     private Message<String> respond(int opcode, int msg_opcode, String response) {
-        char[] ch_opcode = new char[2];
-        char[] ch_msg_opcode = new char[2];
-        shortToByte(ch_opcode, (short)13);
-        shortToByte(ch_msg_opcode, (short)msg_opcode);
         if (response.length() > 0) {
             return new OneStringResponseMessage(opcode, msg_opcode, response);
         }

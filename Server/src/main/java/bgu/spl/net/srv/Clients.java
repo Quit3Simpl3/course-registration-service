@@ -42,6 +42,8 @@ public class Clients {
 
     /**
      * Associates a user object with a client object.
+     * @param clientId - The client's ID.
+     * @param username - The user's username.
      */
     public void setUser(String clientId, String username) {
         Client client = this.get(clientId);
