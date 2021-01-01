@@ -4,8 +4,6 @@
 #include <boost//algorithm//string.hpp>
 //#include "../src/serverMessage.cpp"
 
-
-
 using namespace std;
 
 void adminReg(char a[],std::vector<string>,ConnectionHandler* h,bool* l);
@@ -19,6 +17,12 @@ void studentStat(char a[],std::vector<string>,ConnectionHandler* h,bool* l);
 void isRegistered(char a[],std::vector<string>,ConnectionHandler* h,bool* l);
 void unRegister(char a[],std::vector<string>,ConnectionHandler* h,bool* l);
 void myCourses(char a[],std::vector<string>,ConnectionHandler* h,bool* l);
+
+short bytes_to_short(char* bytesAr) {
+    short result = (short)((bytesAr[0] & 0xff)<<8);
+    result += (short)(bytesAr[1] & 0xff);
+    return result;
+}
 
 userMessage::userMessage(ConnectionHandler *h,bool* t,bool* l) : handler(h), terminate(t),logOut(l) {
     my_map = std::map<std::string, void(*) (char a[],std::vector<string>, ConnectionHandler* h,bool* l)>();
@@ -45,7 +49,12 @@ void userMessage::run() {
             cin.getline(buf, bufsize);
             string line(buf);
             boost::split(inPutLine, line, boost::is_any_of(" "));
-            (my_map.at(inPutLine[0]))(opCode, inPutLine, handler,logOut);
+            try {
+                (my_map.at(inPutLine[0]))(opCode, inPutLine, handler, logOut);
+            }
+            catch (const std::out_of_range e) {
+                cout << "ERROR: " << e.what() << endl;
+            }
             delete[] opCode;
         }
     }
@@ -72,8 +81,8 @@ void sendShort(char a[], char shortMsg[], ConnectionHandler* h) {
     w2[1] = charToSend[3];
 
 
-    short w01 = bytesToShort(w1);
-    short w02 = bytesToShort(w2);
+    short w01 = bytes_to_short(w1);
+    short w02 = bytes_to_short(w2);
 
     cout << "the opcode is:" << w01 << ", ";
     cout << "the message is:" << w02 << ". ";
@@ -110,8 +119,8 @@ void stringToBytes(char a[], string line, int size, ConnectionHandler* h) {
     w2[3] = lineToSend[3];
 
 
-    short w01 = bytesToShort(w1);
-    short w02 = bytesToShort(w2);
+    short w01 = bytes_to_short(w1);
+    short w02 = bytes_to_short(w2);
 
     cout << "the opcode is:" << w01 << ",";
     cout << "the msg is:" << w02 << ",";

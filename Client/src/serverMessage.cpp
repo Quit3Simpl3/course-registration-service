@@ -7,7 +7,7 @@ using namespace std;
 
 void ACK(char a[],ConnectionHandler* h,bool* terminate,bool* l);
 void ERROR(char a[],ConnectionHandler* h,bool* terminate,bool* l);
-short bytesToShort(char* bytesAr);
+static short bytesToShort(char* bytesAr);
 
 serverMessage::serverMessage(ConnectionHandler *h, bool* t, bool* l) : handler(h), terminate(t), logOut(l){
     my_map = std::map<int, void (*)(char a[], ConnectionHandler* h, bool* terminate, bool* l)>();
@@ -54,27 +54,27 @@ void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
     }
     if (messageNum == 6) {
         outPut += '\n';
-        outPut += "Kdam Courses: ";
+//        outPut += "Kdam Courses: ";
          h->getLine(outPut);
     }
     if (messageNum == 7) {
         outPut += '\n';
-        outPut += "Course: ";
+//        outPut += "Course: ";
         h->getLine(outPut);
         outPut += '\n';
-        outPut += "Seats Available: ";
+//        outPut += "Seats Available: ";
         h->getLine(outPut);
         outPut += '\n';
-        outPut += "Students Registered: ";
+//        outPut += "Students Registered: ";
         h->getLine(outPut);
     }
 
     if (messageNum == 8) {
         outPut += '\n';
-        outPut += "Student: ";
+//        outPut += "Student: ";
         h->getLine(outPut);
         outPut += '\n';
-        outPut += "Courses: ";
+//        outPut += "Courses: ";
         h->getLine(outPut);
     }
 
@@ -84,16 +84,13 @@ void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
     }
     if (messageNum == 11) {
         outPut += '\n';
-        outPut += "My Courses: ";
+//        outPut += "My Courses: ";
         h->getLine(outPut);
     }
-
-
-
     cout << outPut << endl;
 }
 
-short bytesToShort(char* bytesAr) {
+static short bytesToShort(char* bytesAr) {
     short result = (short)((bytesAr[0] & 0xff)<<8);
     result += (short)(bytesAr[1] & 0xff);
     return result;
