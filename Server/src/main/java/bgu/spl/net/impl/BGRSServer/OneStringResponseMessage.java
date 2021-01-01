@@ -23,6 +23,11 @@ public class OneStringResponseMessage implements ResponseMessage {
         return wordList;
     }
 
+    @Override
+    public String getResponse() {
+        return this.response;
+    }
+
     public int getMessageOpcode() {
         return this.messageOpcode;
     }

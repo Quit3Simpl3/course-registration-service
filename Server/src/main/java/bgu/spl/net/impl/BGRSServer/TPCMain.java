@@ -30,13 +30,7 @@ public class TPCMain {
             server.serve();
         }
         catch (IOException e) {
-
+            // TODO
         }
-
-        /*Server.threadPerClient(
-                port,
-                BGRSProtocol::new,
-                MessageEncoderDecoderImpl::new
-        ).serve();*/
     }
 }

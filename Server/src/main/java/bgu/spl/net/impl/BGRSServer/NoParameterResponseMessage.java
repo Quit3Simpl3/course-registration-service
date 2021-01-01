@@ -18,6 +18,11 @@ public class NoParameterResponseMessage implements ResponseMessage {
         return null;
     }
 
+    @Override
+    public String getResponse() {
+        return null;
+    }
+
     public int getMessageOpcode() {
         return this.messageOpcode;
     }

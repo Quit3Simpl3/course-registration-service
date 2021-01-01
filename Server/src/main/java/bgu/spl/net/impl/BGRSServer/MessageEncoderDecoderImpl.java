@@ -232,7 +232,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         System.out.print("response:");
         for(byte b : response)
             System.out.print(b + ",");
-        System.out.println();
+        System.out.println("END.");
         // TODO
 
         return response;

@@ -6,18 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TwoStringsMessage implements Message<String> {
-    private String firstWord, secondWord;
-    private int opcode;
+    private final String firstWord, secondWord; // TODO: make sure 'final' works properly here
+    private final int opcode; // TODO: make sure 'final' works properly here
 
     public TwoStringsMessage(int opcode, String firstWord, String secondWord) {
         this.firstWord = firstWord;
         this.secondWord = secondWord;
         this.opcode = opcode;
-    }
-
-    public void setWords(String firstWord, String secondWord) {
-        this.firstWord = firstWord;
-        this.secondWord = secondWord;
     }
 
     @Override
@@ -26,6 +21,11 @@ public class TwoStringsMessage implements Message<String> {
         wordList.add(this.firstWord);
         wordList.add(this.secondWord);
         return wordList;
+    }
+
+    @Override
+    public String getResponse() {
+        return null;
     }
 
     @Override

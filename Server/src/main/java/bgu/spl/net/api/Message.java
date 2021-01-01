@@ -7,12 +7,12 @@ public interface Message<T> {
      * Returns the message's words.
      * @return The list of words in the message.
      */
-    public default List<T> getWords() { return null; };
+    public List<T> getWords();
 
     /**
      * @return The response object.
      */
-    public default T getResponse() { return null; };
+    public T getResponse();
 
     /**
      * Returns the message's opcode.

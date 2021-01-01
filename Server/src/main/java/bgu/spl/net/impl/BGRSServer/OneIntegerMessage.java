@@ -22,6 +22,11 @@ public class OneIntegerMessage implements Message<Integer> {
     }
 
     @Override
+    public Integer getResponse() {
+        return null;
+    }
+
+    @Override
     public int getOpcode() {
         return this.opcode;
     }

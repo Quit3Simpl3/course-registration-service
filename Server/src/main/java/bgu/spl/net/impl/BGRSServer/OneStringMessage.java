@@ -19,6 +19,12 @@ public class OneStringMessage implements Message<String> {
         return this.word;
     }
 
+    public List<String> getWords() {
+        List<String> words_list = new ArrayList<>(1);
+        words_list.add(this.word);
+        return words_list;
+    }
+
     public void setWords(String word) {
         this.word = word;
     }
