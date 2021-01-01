@@ -2,9 +2,9 @@
 #include "../include/connectionHandler.h"
 #include "../include/userMessage.h"
 #include "../include/serverMessage.h"
-/*#include "../src/connectionHandler.cpp"
+#include "../src/connectionHandler.cpp"
 #include "../src/userMessage.cpp"
-#include "../src/serverMessage.cpp"*/
+#include "../src/serverMessage.cpp"
 
 #include <thread>
 
@@ -26,9 +26,11 @@ int main (int argc, char *argv[]) {
         return 1;
     }
     bool* terminate= new bool;
+    bool* logOut= new bool;
     *terminate = false;
-    userMessage userIn(&connectionHandler,terminate);
-    serverMessage serverIn(&connectionHandler,terminate);
+    *logOut = false;
+    userMessage userIn(&connectionHandler,terminate,logOut);
+    serverMessage serverIn(&connectionHandler,terminate,logOut);
 
     thread user(&userMessage::run, &userIn);
     thread server(&serverMessage::run, &serverIn);

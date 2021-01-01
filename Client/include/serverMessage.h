@@ -10,14 +10,15 @@ class serverMessage {
 
     public:
 
-         serverMessage(ConnectionHandler* handler,bool* terminate);
+         serverMessage(ConnectionHandler* handler,bool* terminate, bool* logOut);
 
          void run();
 
     private:
     ConnectionHandler* handler;
     bool* terminate;
-    std::map<int, void (*)(char a[],ConnectionHandler* h, bool* terminate)> my_map;
+    bool* logOut;
+    std::map<int, void (*)(char a[],ConnectionHandler* h, bool* terminate, bool* logOut)> my_map;
 
 };
 
