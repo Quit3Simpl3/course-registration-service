@@ -13,17 +13,28 @@ public class Client {
     }
 
     public Client(String id) {
+        // TODO: TEST
+        System.out.println("Creating Client: " + id);
+        // TODO: TEST
+
         this.id = id;
         this.user = null;
     }
 
     public void setUser(User user) {
+        if (!Objects.isNull(this.user))
+            throw new IllegalStateException("Client is already logged-in with a different user.");
+
         this.user = user;
     }
 
+    public void removeUser() {
+        this.user = null;
+    }
+
     public User getUser() {
-        if (Objects.isNull(user))
-            throw new IllegalStateException("User not set for this client.");
+//        if (Objects.isNull(user))
+//            throw new IllegalStateException("User not set for this client.");
         return this.user;
     }
 

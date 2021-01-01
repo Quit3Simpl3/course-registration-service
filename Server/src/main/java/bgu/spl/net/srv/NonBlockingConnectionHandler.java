@@ -33,6 +33,10 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     }
 
     public Runnable continueRead() {
+        // TODO: TEST
+        System.out.println("continueRead()");
+        // TODO: TEST
+
         ByteBuffer buf = leaseBuffer();
 
         boolean success = false;
@@ -44,11 +48,12 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         }
 
         if (success) {
-            buf.flip();
+	    buf.flip();
             return () -> {
                 try {
                     while (buf.hasRemaining()) {
-                        T nextMessage = encdec.decodeNextByte(buf.get());
+                        byte nextByte = buf.get();
+                        T nextMessage = encdec.decodeNextByte(nextByte);
                         if (nextMessage != null) {
                             T response = protocol.process(nextMessage);
                             if (response != null) {
