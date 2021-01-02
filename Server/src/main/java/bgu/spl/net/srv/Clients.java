@@ -46,8 +46,16 @@ public class Clients {
      * @param username - The user's username.
      */
     public void setUser(String clientId, String username) {
+        // TODO: TEST
+        System.out.println("Clients: Set user " + username + " for client " + clientId);
+        // TODO: TEST
+
         Client client = this.get(clientId);
         User user = Database.getInstance().getUser(username);
         client.setUser(user);
+
+        // TODO: TEST
+        System.out.println("client.getUser() = " + client.getUser());
+        // TODO: TEST
     }
 }

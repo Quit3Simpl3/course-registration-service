@@ -9,10 +9,6 @@ public class User {
     boolean isAdmin;
     boolean isLoggedIn;
 
-    public User(String username, String password) {
-        new User(username, password, false);
-    }
-
     public User(String username, String password, boolean isAdmin) {
         // TODO: TEST
         String role = "student";
@@ -27,32 +23,10 @@ public class User {
     }
 
     public void login(String password) throws Exception {
-        // TODO: TEST
-        System.out.println("Login as " + this.getUsername() + " with password " + password);
-        // TODO: TEST
-
-        if (password.equals(this.password)) {
-            // TODO: TEST
-            System.out.println("Login successful.");
-            // TODO: TEST
-
-            this.isLoggedIn = (password.equals(this.password));
-        }
-        else {
-            throw new Exception("Wrong password.");
-        }
-
-        /*if (this.isLoggedIn()) {// Check whether the user is already logged in
-            throw new Exception("The user is already logged in.");
-        }
-        else {
-            // TODO: TEST
-            System.out.println("Login successful.");
-            // TODO: TEST
-
-            this.isLoggedIn = (password.equals(this.password));
-            return this.isLoggedIn();
-        }*/
+        if (password.equals(this.password))
+            this.isLoggedIn = true;
+        else
+            throw new Exception("Wrong password \"" + password + "\" for user \"" + this.getUsername() + "\"");
     }
 
     public boolean logout() {

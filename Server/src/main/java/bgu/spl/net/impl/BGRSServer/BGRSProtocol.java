@@ -51,6 +51,14 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         }
     }
 
+    private void logout() {
+        // TODO: TEST
+        System.out.println("logout(): client.getUser() = " + database.Clients().get(this.clientId).getUser());
+        // TODO: TEST
+
+        this.database.logoutUser(this.clientId);
+    }
+
     public BGRSProtocol() {
         // Create Database instance:
         this.database = Database.getInstance();
@@ -60,15 +68,11 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         this.messageHandlers = new HashMap<>();
         this.addMessageHandler(
                 1, // "ADMINREG"
-                (words)->{
-                    return createUser(1, words.get(0).toString(), words.get(1).toString(), true);
-                }
+                (words)-> createUser(1, words.get(0).toString(), words.get(1).toString(), true)
         );
         this.addMessageHandler(
                 2, // "STUDENTREG"
-                (words)->{
-                    return createUser(2, words.get(0).toString(), words.get(1).toString(),false);
-                }
+                (words)-> createUser(2, words.get(0).toString(), words.get(1).toString(),false)
         );
         this.addMessageHandler(
                 3, // "LOGIN"
@@ -77,6 +81,11 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         // userLogin handles whether the user is already logged-in,
                         // setUser handles whether this client already logged-in with a different user.
                         database.userLogin(this.clientId, words.get(0).toString(), words.get(1).toString());
+
+                        // TODO: TEST
+                        System.out.println("LOGIN: client.getUser() = " + database.Clients().get(this.clientId).getUser());
+                        // TODO: TEST
+
                         return ack(3);
                     }
                     catch (Exception e) {
@@ -90,7 +99,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 (words)->{
                     try {
                         // Logout the user associated to this clientId
-                        this.database.logoutUser(this.clientId);
+                        logout();
                         this.shouldTerminate = true; // Close the client's socket.
                         return ack(4);
                     }
@@ -251,7 +260,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                     for (Course course : courses)
                         courseNumbers.add(course.getCourseNumber());
 
-                    return ack(11, courseNumbers.toString() + "\0");
+                    return ack(11, courseNumbers.toString().replace(" ", "") + "\0");
                 }
         );
     }
