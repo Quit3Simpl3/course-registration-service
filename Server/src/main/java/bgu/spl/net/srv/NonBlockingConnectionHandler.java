@@ -33,10 +33,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     }
 
     public Runnable continueRead() {
-        // TODO: TEST
-        System.out.println("continueRead()");
-        // TODO: TEST
-
         ByteBuffer buf = leaseBuffer();
 
         boolean success = false;

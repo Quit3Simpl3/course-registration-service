@@ -96,7 +96,7 @@ public class Course {
         }
     }
 
-    public boolean unregister(User student) {
+    public synchronized boolean unregister(User student) {
         String username;
         try {
             username = (this.students.remove(student.getUsername())).getUsername();
@@ -104,6 +104,7 @@ public class Course {
         catch (NullPointerException e) {
             throw new IllegalArgumentException("The student is not registered to this course.");
         }
+        this.freeSeats.getAndIncrement();
         // Make sure the correct student was removed:
         return (username.equals(student.getUsername()));
     }

@@ -10,12 +10,6 @@ public class User {
     boolean isLoggedIn;
 
     public User(String username, String password, boolean isAdmin) {
-        // TODO: TEST
-        String role = "student";
-        if (isAdmin) role = "admin";
-        System.out.println("Creating User: " + username + " as " + role + " with password " + password);
-        // TODO: TEST
-
         this.username = username;
         this.password = password;
         this.isAdmin = isAdmin;

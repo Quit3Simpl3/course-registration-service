@@ -18,10 +18,6 @@ public class Client {
     }
 
     public void setUser(User user) {
-        // TODO: TEST
-        System.out.println("Client.setUser("+user.getUsername()+").");
-        // TODO: TEST
-
         if (!Objects.isNull(this.user))
             throw new IllegalStateException("Client is already logged-in with a different user.");
 

@@ -70,9 +70,6 @@ public class Database {
 
 	public User createUser(String username, String password, boolean isAdmin) {
 		User user = new User(username, password, isAdmin);
-
-		System.out.println("Adding user to DB if it doesn't exist: " + username);
-
 		if (!Objects.isNull(this.users.putIfAbsent(username, user))) // If user doesn't exists, HashMap returns null
 			throw new IllegalArgumentException("This user already exists.");
 
@@ -129,7 +126,7 @@ public class Database {
 		this.users = new ConcurrentHashMap<>();
 
 		// TODO
-		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+//		System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		// TODO
 
 		this.input_file_path = "./Courses.txt";
