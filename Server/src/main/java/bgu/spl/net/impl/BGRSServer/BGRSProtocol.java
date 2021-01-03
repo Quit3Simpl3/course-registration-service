@@ -33,9 +33,13 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
 
     private Message<String> createUser(int msg_opcode, String username, String password, boolean isAdmin) {
         try {
+            if (!Objects.isNull(database.Clients().get(this.clientId).getUser()))
+                throw new IllegalStateException("Client cannot register a new user while logged-in.");
+
             database.createUser(username, password, isAdmin);
         }
         catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return error(msg_opcode);
         }
         return ack(msg_opcode);
