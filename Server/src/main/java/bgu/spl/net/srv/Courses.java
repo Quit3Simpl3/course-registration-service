@@ -54,31 +54,6 @@ public class Courses {
             }
         }
         return null;
-
-
-
-        /*// TODO: TEST
-        System.out.println("Courses.getCourse(" + id + ").");
-        System.out.println("courses.size() = " + courses.size());
-        // TODO: TEST
-
-        //try {
-            Integer index = this.courseIdToIndex.get(id);
-
-        // TODO: TEST
-        System.out.println("courseIdToIndex = " + index + ".");
-        // TODO: TEST
-
-            if (Objects.isNull(index)) // Course not found in HashMap // TODO: test this!!!
-                for (Course course : this.courses)
-                    if (course.getCourseNumber() == id)
-                        return course;
-
-            return this.courses.get(index);
-        }
-        catch (NoSuchElementException e) {
-            throw new NoSuchElementException("Course number " + id + " does not exist.");
-        }*/
     }
 
     /**

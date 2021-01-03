@@ -46,9 +46,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             return this.decodeMessageByOpcode[opcode - 1];
         }
         catch (Exception e) {
-            // TODO
-            System.out.print(e.getMessage());
-            // TODO
             throw new IllegalArgumentException("Unknown opcode provided.");
         }
     }
@@ -66,10 +63,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message<String> decodeTwoStringMessage(byte nextByte) {
-        // TODO: TEST
-        System.out.println("decodeTwoStringMessage(" + nextByte + ")");
-        // TODO: TEST
-
         if (nextByte == '\0') {
             this.zeros_counter--;
             if (this.zeros_counter <= 0) {
@@ -108,10 +101,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message<String> decodeOneStringMessage(byte nextByte) {
-        // TODO: TEST
-        System.out.println("decodeOneStringMessage(" + nextByte + ")");
-        // TODO: TEST
-
         if (nextByte == '\0') {
             Message message = new OneStringMessage(
                     this.opcode,
@@ -128,10 +117,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message<Integer> decodeOneIntegerMessage(byte nextByte) {
-        // TODO: TEST
-        System.out.println("decodeOneIntegerMessage(" + nextByte + ")");
-        // TODO: TEST
-
         bytes[first_len++] = nextByte;
 
         if (first_len == 2) {
@@ -142,10 +127,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     private Message decodeNoParameterMessage(byte nextByte) {
-        // TODO: TEST
-        System.out.println("decodeNoParameterMessage(" + nextByte + ")");
-        // TODO: TEST
-
         if (len == 2) {
             resetEncoderDecoder();
             return new OneIntegerMessage(this.opcode, (int) byteToShort(this.bytes));
@@ -156,10 +137,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
     @Override
     public Message decodeNextByte(byte nextByte) {
-        // TODO: TEST
-        System.out.println("nextByte=" + nextByte);
-        // TODO: TEST
-
         if (len == 0) { // First byte is 0 - ignored.
             this.len++;
         }
@@ -169,10 +146,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             /*opcode_bytes[0] = 0; // TODO: delete if works
             opcode_bytes[1] = nextByte;*/ // TODO: delete if works
             opcode = byteToShort(new byte[] {0, nextByte}); // Set opcode
-
-            // TODO: TEST
-            System.out.println("opcode=" + opcode);
-            // TODO: TEST
 
             if (opcode == 4 /*LOGOUT*/ || opcode == 11 /*MYCOURSES*/) // Handle opcode-only messages
                  return decodeNoParameterMessage(nextByte);
@@ -199,21 +172,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         if (!Objects.isNull(message.getResponse()))
             reply_str = message.getResponse().toString();
 
-//        String reply_str = "";
-//        int messageLength = 0;
-
-//        if (!Objects.isNull(words)) {
-//            for (Object word : words) {
-//                if (word instanceof String) {
-//                    messageLength += ((String) word).length(); // If the word is a string, add its length to the total length
-//                    reply_str += (String) word;
-//                }
-//               /* else { // TODO: is this needed?
-//                    messageLength++; // Otherwise, add one to the length.
-//                }*/
-//            }
-//        }
-
         byte[] opcode = shortToBytes((short)message.getOpcode()); // Must cast to short for the function to work
         byte[] msg_opcode = shortToBytes((short)message.getMessageOpcode());
         byte[] words_bytes = reply_str.getBytes();
@@ -227,13 +185,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         response[1] = opcode[1];
         response[2] = msg_opcode[0];
         response[3] = msg_opcode[1];
-
-        // TODO
-        System.out.print("response:");
-        for(byte b : response)
-            System.out.print(b + ",");
-        System.out.println("END.");
-        // TODO
 
         return response;
     }

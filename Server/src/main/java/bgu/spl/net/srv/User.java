@@ -23,8 +23,9 @@ public class User {
     }
 
     public void login(String password) throws Exception {
-        if (password.equals(this.password))
+        if (password.equals(this.password)) {
             this.isLoggedIn = true;
+        }
         else
             throw new Exception("Wrong password \"" + password + "\" for user \"" + this.getUsername() + "\"");
     }

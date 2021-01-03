@@ -50,7 +50,7 @@ public class Course {
     }
 
     public boolean containsStudent(User user) {
-        return this.students.containsValue(user);
+        return this.students.containsKey(user.getUsername());
     }
 
     public boolean containsStudent(String username) {

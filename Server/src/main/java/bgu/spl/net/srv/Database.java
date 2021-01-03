@@ -27,20 +27,23 @@ public class Database {
 		private final static Database instance = new Database();
 	}
 
-	public void userLogin(String clientId, String username, String password) throws Exception {
+	public synchronized void userLogin(String clientId, String username, String password) throws Exception {
 		User user = this.getUser(username);
 		User current_user = this.Clients().get(clientId).getUser();
-		if (!Objects.isNull(current_user)) {
-			if (current_user != user)
+		if (!Objects.isNull(current_user)) /*{
+			if (current_user != user)*/
 				throw new Exception("Client already logged-in with a different user.");
-			else { // current_user == new_user
+			/*else { // current_user == new_user
 				user.login(password);
 			}
-		}
+		}*/ // TODO: check if ACK when logging-in again with same user correctly
 		else { // Client isn't logged-in
-			 if (!user.isLoggedIn()) { // Check if the user is already logged-in with a different client
+			if (!user.isLoggedIn()) { // Check if the user is already logged-in with a different client
 				user.login(password);
 				this.Clients().setUser(clientId, username); // Associate the user with this client
+			}
+			else {
+				throw new Exception("User is already logged-in.");
 			}
 		}
 	}
@@ -78,11 +81,6 @@ public class Database {
 
 	public User getUser(String username) {
 		User user = this.users.get(username);
-
-		// TODO: TEST
-		System.out.println("users.keySet() = " + users.keySet());
-		// TODO: TEST
-
 		if (Objects.isNull(user))
 			throw new IllegalArgumentException("User '" + username + "' does not exist.");
 
@@ -134,7 +132,7 @@ public class Database {
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		// TODO
 
-		this.input_file_path = "../Courses.txt";
+		this.input_file_path = "./Courses.txt";
 		this.initialize(this._get_input_file_path());
 	}
 
