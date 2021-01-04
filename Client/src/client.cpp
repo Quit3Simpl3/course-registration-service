@@ -2,15 +2,12 @@
 #include "../include/connectionHandler.h"
 #include "../include/userMessage.h"
 #include "../include/serverMessage.h"
-#include "../src/connectionHandler.cpp"
-#include "../src/userMessage.cpp"
-#include "../src/serverMessage.cpp"
+//#include "../src/connectionHandler.cpp"
+//#include "../src/userMessage.cpp"
+//#include "../src/serverMessage.cpp"
 
 #include <thread>
 
-/**
-* This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
-*/
 int main (int argc, char *argv[]) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
@@ -29,13 +26,13 @@ int main (int argc, char *argv[]) {
     bool* logOut= new bool;
     *terminate = false;
     *logOut = false;
-    userMessage userIn(&connectionHandler,terminate,logOut);
-    serverMessage serverIn(&connectionHandler,terminate,logOut);
+    userMessage userIn(&connectionHandler, terminate,logOut);
+    serverMessage serverIn(&connectionHandler, terminate, logOut);
 
     thread user(&userMessage::run, &userIn);
     thread server(&serverMessage::run, &serverIn);
 
-    //sync because we dont want to lose data from server
+    // Sync because we don't want to lose data from server
     server.join();
     user.join();
 
