@@ -41,5 +41,6 @@ int main (int argc, char *argv[]) {
 
 
     delete terminate;
+    delete logOut;
     return 0;
 }
