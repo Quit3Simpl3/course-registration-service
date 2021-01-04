@@ -21,8 +21,6 @@ void serverMessage::run() {
         handler->getBytes(opCode, 2);
         short opCodeNum = bytesToShort(opCode);
 
-        cout << "Received from server: " << opCodeNum << endl; // TODO
-
         (my_map.at(opCodeNum))(opCode, handler, terminate,logOut);
         delete[] opCode;
     }
@@ -35,8 +33,6 @@ void ERROR(char a[], ConnectionHandler* h, bool* terminate,bool* l){
         *l = false;
     outPut += " " + to_string(messageNum);
 
-    cout << "Received error from server" << endl; // TODO
-
     cout << outPut << endl;
 }
 void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
@@ -45,8 +41,6 @@ void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
     char messageOpCode[2];
     h->getBytes(messageOpCode, 2);
 
-    cout << "Received ack from server " << messageOpCode << endl; // TODO
-
     short messageNum = bytesToShort(messageOpCode);
     outPut += " " + to_string(messageNum);
     if (messageNum == 4) {
@@ -54,7 +48,6 @@ void ACK(char a[], ConnectionHandler* h, bool* terminate, bool* l) {
     }
     if (messageNum == 6) {
         outPut += '\n';
-//        outPut += "Kdam Courses: ";
          h->getLine(outPut);
     }
     if (messageNum == 7) {

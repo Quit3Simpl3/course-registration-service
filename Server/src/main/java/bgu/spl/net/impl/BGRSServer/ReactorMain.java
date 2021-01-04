@@ -15,16 +15,16 @@ public class ReactorMain {
             System.out.println("You must supply two arguments: port, threads");
             System.exit(1);
         }
-
         Database database = Database.getInstance();
         int port = parseInt(args[0]);
         int threads = parseInt(args[1]);
+
         try (Server<Message> server = new Reactor<Message>(
                 threads,
                 port,
                 BGRSProtocol::new,
                 MessageEncoderDecoderImpl::new
-        )) {
+            )) {
             server.serve(); // Start the server reactor...
         }
         catch (IOException e) {

@@ -125,10 +125,6 @@ public class Database {
 		this.clients = Clients.getInstance();
 		this.users = new ConcurrentHashMap<>();
 
-		// TODO
-//		System.out.println("Working Directory = " + System.getProperty("user.dir"));
-		// TODO
-
 		this.input_file_path = "./Courses.txt";
 		this.initialize(this._get_input_file_path());
 	}
@@ -152,6 +148,7 @@ public class Database {
 			System.out.println(e.getMessage());
 			return false;
 		}
+
 		return this.courses.validateCourses();
 	}
 }

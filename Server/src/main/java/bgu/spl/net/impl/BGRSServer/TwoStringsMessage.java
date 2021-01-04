@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TwoStringsMessage implements Message<String> {
-    private final String firstWord, secondWord; // TODO: make sure 'final' works properly here
-    private final int opcode; // TODO: make sure 'final' works properly here
+    private final String firstWord, secondWord;
+    private final int opcode;
 
     public TwoStringsMessage(int opcode, String firstWord, String secondWord) {
         this.firstWord = firstWord;

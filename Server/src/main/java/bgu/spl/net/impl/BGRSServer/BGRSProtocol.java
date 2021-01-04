@@ -35,8 +35,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
             database.createUser(username, password, isAdmin);
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
-            return error(msg_opcode);
+            return error(msg_opcode, e.getMessage());
         }
         return ack(msg_opcode);
     }
@@ -81,8 +80,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         return ack(3);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(3);
+                        return error(3, e.getMessage());
                     }
                 }
         );
@@ -96,8 +94,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         return ack(4);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(4);
+                        return error(4, e.getMessage());
                     }
                 }
         );
@@ -114,8 +111,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         return ack(5);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(5);
+                        return error(5, e.getMessage());
                     }
                 }
         );
@@ -128,7 +124,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         return ack(6, course.getKdam().toString().replace(" ", "") + "\0");
                     }
                     catch (Exception e) {
-                        return error(6);
+                        return error(6, e.getMessage());
                     }
                 }
         );
@@ -155,7 +151,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                                 studentNames.add(student.getUsername());
                         }
                         if (!Objects.isNull(studentNames) && studentNames.size() > 1)
-                            Collections.sort(studentNames); // Sort them alphabetically // TODO: make sure we print it correctly (spaces???)
+                            Collections.sort(studentNames); // Sort them alphabetically
 
                         return ack(
                                 7,
@@ -165,8 +161,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         );
                     }
                     catch (Exception e) {
-                        System.out.println("COURSESTAT ERROR: " + e.getMessage());
-                        return error(7);
+                        return error(7, e.getMessage());
                     }
                 }
         );
@@ -195,8 +190,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         );
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(8);
+                        return error(8, e.getMessage());
                     }
                 }
         );
@@ -216,8 +210,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         }
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(9);
+                        return error(9, e.getMessage());
                     }
                 }
         );
@@ -234,7 +227,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                             throw new Exception("Could not unregister the provided user from the course.");
                     }
                     catch (Exception e) {
-                        return error(10);
+                        return error(10, e.getMessage());
                     }
                 }
         );
@@ -248,8 +241,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                             throw new Exception("Client is not logged-in.");
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(11);
+                        return error(11, e.getMessage());
                     }
                     List<Course> courses = user.getCourses();
                     List<Integer> courseNumbers = new ArrayList<>();
@@ -279,7 +271,8 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         return respond(12, msg_opcode, response);
     }
 
-    private ResponseMessage error(int msg_opcode) { // ERROR OPCODE = 13
+    private ResponseMessage error(int msg_opcode, String msg) { // ERROR OPCODE = 13
+        System.out.println("ERROR: " + msg); // TODO: COMMENT BEFORE SUBMITTING
         return respond(13, msg_opcode, "");
     }
 
@@ -290,7 +283,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         Function<List, Message<String>> func = this.getHandler(opcode); // Try getting the command by its opcode
 
         if (Objects.isNull(func))
-            return error(opcode);
+            return error(opcode, "Handler function not found.");
 
         return func.apply(words);
     }

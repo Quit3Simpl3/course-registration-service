@@ -14,7 +14,7 @@ public class TPCMain {
             System.exit(1);
         }
 
-        Database database = Database.getInstance(); // TODO: maybe add here and in the ReactorMain a countdown latch?
+        Database database = Database.getInstance();
         int port = parseInt(args[0]);
 
         try (Server<Message> server = new BaseServer<Message>(

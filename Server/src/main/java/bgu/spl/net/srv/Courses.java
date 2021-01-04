@@ -69,9 +69,6 @@ public class Courses {
      * Return a List of all courses the student is signed up to.
      */
     public List<Course> getStudentCourses(User student) {
-//        if (student.isAdmin()) // TODO: is this necessary for opcode 11?
-//            throw new IllegalArgumentException("The provided user is an admin, that cannot be signed-up to courses.");
-
         List<Course> userCourses = new ArrayList<>();
         // Add the courses to the userCourses list by order of appearance in Courses.txt:
         for (Course course : this.courses)
