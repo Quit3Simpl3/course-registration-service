@@ -29,6 +29,8 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message<
     public MessageEncoderDecoderImpl() {
         // Setup message decoder functions:
         this.decodeMessageByOpcode = new ArrayList<>(11);
+        for (int i = 0; i < 11; i++)
+            this.decodeMessageByOpcode.add(null);
 
         for (int i = 0; i <= 2; i++)
             this.decodeMessageByOpcode.set(i, this::decodeTwoStringMessage);
