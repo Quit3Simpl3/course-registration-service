@@ -70,9 +70,12 @@ serverMessage::serverMessage(ConnectionHandler *h, bool* t, bool* l) :
 void serverMessage::run() {
     while (!(*terminate)) {
         char * opCode = new char[2];
+
         handler->getBytes(opCode, 2);
         short opCodeNum = serverMessage::bytesToShort(opCode);
-        (my_map.at(opCodeNum))(opCode, handler, terminate,logOut);
+
+        (my_map.at(opCodeNum))(opCode, handler, terminate, logOut);
+
         delete[] opCode;
     }
 }
