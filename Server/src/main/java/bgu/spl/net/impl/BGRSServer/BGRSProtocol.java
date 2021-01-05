@@ -24,19 +24,18 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
     }
 
     private Function<List, Message<String>> getHandler(int opcode) {
-        // TODO: TEST
-        System.out.println("getHandler("+opcode+")");
-        // TODO: TEST
-
         return this.messageHandlers.get(opcode);
     }
 
     private Message<String> createUser(int msg_opcode, String username, String password, boolean isAdmin) {
         try {
+            if (!Objects.isNull(database.Clients().get(this.clientId).getUser()))
+                throw new IllegalStateException("Client cannot register a new user while logged-in.");
+
             database.createUser(username, password, isAdmin);
         }
-        catch (IllegalArgumentException e) {
-            return error(msg_opcode);
+        catch (Exception e) {
+            return error(msg_opcode, e.getMessage());
         }
         return ack(msg_opcode);
     }
@@ -51,6 +50,10 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         }
     }
 
+    private void logout() {
+        this.database.logoutUser(this.clientId);
+    }
+
     public BGRSProtocol() {
         // Create Database instance:
         this.database = Database.getInstance();
@@ -60,15 +63,11 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         this.messageHandlers = new HashMap<>();
         this.addMessageHandler(
                 1, // "ADMINREG"
-                (words)->{
-                    return createUser(1, words.get(0).toString(), words.get(1).toString(), true);
-                }
+                (words)-> createUser(1, words.get(0).toString(), words.get(1).toString(), true)
         );
         this.addMessageHandler(
                 2, // "STUDENTREG"
-                (words)->{
-                    return createUser(2, words.get(0).toString(), words.get(1).toString(),false);
-                }
+                (words)-> createUser(2, words.get(0).toString(), words.get(1).toString(),false)
         );
         this.addMessageHandler(
                 3, // "LOGIN"
@@ -77,11 +76,11 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         // userLogin handles whether the user is already logged-in,
                         // setUser handles whether this client already logged-in with a different user.
                         database.userLogin(this.clientId, words.get(0).toString(), words.get(1).toString());
+
                         return ack(3);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(3);
+                        return error(3, e.getMessage());
                     }
                 }
         );
@@ -90,13 +89,12 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 (words)->{
                     try {
                         // Logout the user associated to this clientId
-                        this.database.logoutUser(this.clientId);
+                        logout();
                         this.shouldTerminate = true; // Close the client's socket.
                         return ack(4);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(4);
+                        return error(4, e.getMessage());
                     }
                 }
         );
@@ -105,21 +103,15 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 (words)->{
                     try {
                         int courseNum = parseInt(words.get(0).toString());
-                        System.out.println("COURSEREG: " + courseNum);
                         Course course = database.Courses().getCourse(courseNum);
                         if (Objects.isNull(course))
                             throw new IllegalArgumentException("Course " + courseNum + " does not exist.");
-
-                        // TODO
-                        System.out.println("course = " + course.getCourseNumber() + ", " + course.getName());
-                        // TODO
 
                         database.Courses().register(course, database.Clients().get(this.clientId).getUser());
                         return ack(5);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(5);
+                        return error(5, e.getMessage());
                     }
                 }
         );
@@ -132,23 +124,22 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         return ack(6, course.getKdam().toString().replace(" ", "") + "\0");
                     }
                     catch (Exception e) {
-                        return error(6);
+                        return error(6, e.getMessage());
                     }
                 }
         );
         this.addMessageHandler(
                 7, // "COURSESTAT" // Admin only!
                 (words)->{
-                    // TODO: TEST
-                    System.out.println("COURSESTAT");
-                    // TODO: TEST
-
                     int courseNum = parseInt(words.get(0).toString());
                     try {
                         if (!this.isAdmin())
                             throw new IllegalArgumentException("Admin privileges required.");
 
                         Course course = database.Courses().getCourse(courseNum);
+                        if (Objects.isNull(course))
+                            throw new IllegalArgumentException("Course " + courseNum + " does not exist.");
+
                         String courseName = course.getName();
                         int freeSeats = course.getAvailableSeats();
                         int maxSeats = course.getMaxStudents();
@@ -159,7 +150,8 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                             for (User student : students)
                                 studentNames.add(student.getUsername());
                         }
-                        Collections.sort(studentNames); // Sort them alphabetically // TODO: make sure we print it correctly (spaces???)
+                        if (!Objects.isNull(studentNames) && studentNames.size() > 1)
+                            Collections.sort(studentNames); // Sort them alphabetically
 
                         return ack(
                                 7,
@@ -169,18 +161,13 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         );
                     }
                     catch (Exception e) {
-                        System.out.println("COURSESTAT ERROR: " + e.getMessage());
-                        return error(7);
+                        return error(7, e.getMessage());
                     }
                 }
         );
         this.addMessageHandler(
                 8, // "STUDENTSTAT" // Admin Only!
                 (words)->{
-                    // TODO: TEST
-                    System.out.println("COURSESTAT");
-                    // TODO: TEST
-
                     try {
                         String username = (String)words.get(0);
                         if (!this.isAdmin())
@@ -203,26 +190,27 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                         );
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        return error(8);
+                        return error(8, e.getMessage());
                     }
                 }
         );
         this.addMessageHandler(
-                9, // "ISREGISTERED
+                9, // "ISREGISTERED"
                 (words)->{
-                    int courseNum = (int)words.get(0);
+                    int courseNum = parseInt(words.get(0).toString());
                     try {
                         Course course = database.Courses().getCourse(courseNum);
                         if (database.Courses().isStudentRegistered(
                                 database.Clients().get(this.clientId).getUser(),
-                                course))
-                            return ack(9, "REGISTERED");
-                        else
-                            return ack(9, "NOT REGISTERED");
+                                course)) {
+                            return ack(9, "REGISTERED\0");
+                        }
+                        else {
+                            return ack(9, "NOT REGISTERED\0");
+                        }
                     }
                     catch (Exception e) {
-                        return error(9);
+                        return error(9, e.getMessage());
                     }
                 }
         );
@@ -239,19 +227,28 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                             throw new Exception("Could not unregister the provided user from the course.");
                     }
                     catch (Exception e) {
-                        return error(10);
+                        return error(10, e.getMessage());
                     }
                 }
         );
         this.addMessageHandler(
                 11, // "MYCOURSES"
                 (words)->{
-                    List<Course> courses = database.Clients().get(this.clientId).getUser().getCourses();
+                    User user = null;
+                    try {
+                        user = database.Clients().get(this.clientId).getUser();
+                        if (Objects.isNull(user))
+                            throw new Exception("Client is not logged-in.");
+                    }
+                    catch (Exception e) {
+                        return error(11, e.getMessage());
+                    }
+                    List<Course> courses = user.getCourses();
                     List<Integer> courseNumbers = new ArrayList<>();
                     for (Course course : courses)
                         courseNumbers.add(course.getCourseNumber());
 
-                    return ack(11, courseNumbers.toString() + "\0");
+                    return ack(11, courseNumbers.toString().replace(" ", "") + "\0");
                 }
         );
     }
@@ -274,23 +271,19 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         return respond(12, msg_opcode, response);
     }
 
-    private ResponseMessage error(int msg_opcode) { // ERROR OPCODE = 13
+    private ResponseMessage error(int msg_opcode, String msg) { // ERROR OPCODE = 13
+        System.out.println("ERROR: " + msg); // TODO: COMMENT BEFORE SUBMITTING
         return respond(13, msg_opcode, "");
     }
 
     public Message process(Message msg) {
-        // TODO
-        System.out.println("PROTOCOL: opcode received: " + msg.getOpcode());
-        System.out.println("PROTOCOL: words received: " + msg.getWords().toString());
-        // TODO
-
         int opcode = msg.getOpcode();
         List words = msg.getWords();
 
         Function<List, Message<String>> func = this.getHandler(opcode); // Try getting the command by its opcode
 
         if (Objects.isNull(func))
-            return error(opcode);
+            return error(opcode, "Handler function not found.");
 
         return func.apply(words);
     }

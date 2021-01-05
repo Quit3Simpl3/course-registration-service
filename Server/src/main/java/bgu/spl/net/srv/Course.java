@@ -50,7 +50,7 @@ public class Course {
     }
 
     public boolean containsStudent(User user) {
-        return this.students.containsValue(user);
+        return this.students.containsKey(user.getUsername());
     }
 
     public boolean containsStudent(String username) {
@@ -65,38 +65,42 @@ public class Course {
         return this.freeSeats.get();
     }
 
-    public synchronized void register(User student) throws Exception {
+    public void register(User student) throws Exception {
         if (Objects.isNull(student))
             throw new NullPointerException("Student object is null");
+
         if (student.isAdmin()) // Check whether this user is an admin
             throw new IllegalArgumentException("Admins cannot register to courses.");
-        if (this.containsStudent(student)) // TODO: is this needed?
+
+        if (this.containsStudent(student))
             throw new IllegalArgumentException("Student " + student.getUsername() + " is already registered to course " + this.getCourseNumber());
 
-        // Check if a seat is available:
-        if (this.freeSeats.get() <= 0)
-            throw new Exception("No available seats for this course.");
-        else {
-            // Update seat count:
-            this.freeSeats.getAndDecrement();
-            // Check if student is already in this course:
-            if (this.containsStudent(student))
-                this.freeSeats.getAndIncrement(); // Release the student's seat
-            else { // Otherwise, continue with registration:
-                // Check kdam courses:
-                for (int kdam_course : this.kdam) {
-                    if (!(this.courses.getCourse(kdam_course)).containsStudent(student)) {
-                        this.freeSeats.getAndIncrement(); // Release the student's seat
-                        throw new Exception("The student isn't registered to all the kdam courses.");
+        synchronized (this) {
+            // Check if a seat is available:
+            if (this.freeSeats.get() <= 0) {
+                throw new Exception("No available seats for this course.");
+            }
+            else { // Register the user to this course:
+                this.freeSeats.getAndDecrement(); // Update seat count: freeSeats--
+                // Check if student is already in this course:
+                if (this.containsStudent(student))
+                    this.freeSeats.getAndIncrement(); // Release the student's seat
+                else { // Otherwise, continue with registration:
+                    // Check kdam courses:
+                    for (int kdam_course : this.kdam) {
+                        if (!(this.courses.getCourse(kdam_course)).containsStudent(student)) {
+                            this.freeSeats.getAndIncrement(); // Release the student's seat
+                            throw new Exception("The student isn't registered to all the kdam courses.");
+                        }
                     }
+                    // Register student:
+                    students.put(student.getUsername(), student);
                 }
-                // Register student:
-                students.put(student.getUsername(), student);
             }
         }
     }
 
-    public boolean unregister(User student) {
+    public synchronized boolean unregister(User student) {
         String username;
         try {
             username = (this.students.remove(student.getUsername())).getUsername();
@@ -104,6 +108,7 @@ public class Course {
         catch (NullPointerException e) {
             throw new IllegalArgumentException("The student is not registered to this course.");
         }
+        this.freeSeats.getAndIncrement();
         // Make sure the correct student was removed:
         return (username.equals(student.getUsername()));
     }
