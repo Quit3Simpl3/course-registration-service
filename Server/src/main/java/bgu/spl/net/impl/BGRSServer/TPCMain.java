@@ -17,13 +17,13 @@ public class TPCMain {
         Database database = Database.getInstance();
         int port = parseInt(args[0]);
 
-        try (Server<Message> server = new BaseServer<Message>(
+        try (Server<Message<?>> server = new BaseServer<Message<?>>(
                     port,
                     BGRSProtocol::new,
                     MessageEncoderDecoderImpl::new
                 ) {
                     @Override
-                    protected void execute(BlockingConnectionHandler<Message> handler) {
+                    protected void execute(BlockingConnectionHandler<Message<?>> handler) {
                         new Thread(handler).start();
                     }
                 }) {

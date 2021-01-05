@@ -12,18 +12,18 @@ import java.util.function.Function;
 
 import static java.lang.Integer.parseInt;
 
-public class BGRSProtocol implements MessagingProtocol<Message> {
+public class BGRSProtocol implements MessagingProtocol<Message<?>> {
     // Private fields:
-    final HashMap<Integer, Function<List, Message<String>>> messageHandlers; // messageHandlers<opcode, function>
+    final HashMap<Integer, Function<List<?>, Message<String>>> messageHandlers; // messageHandlers<opcode, function>
     Database database;
     String clientId;
     boolean shouldTerminate;
 
-    private void addMessageHandler(int opcode, Function<List, Message<String>> function) {
+    private void addMessageHandler(int opcode, Function<List<?>, Message<String>> function) {
         this.messageHandlers.put(opcode, function);
     }
 
-    private Function<List, Message<String>> getHandler(int opcode) {
+    private Function<List<?>, Message<String>> getHandler(int opcode) {
         return this.messageHandlers.get(opcode);
     }
 
@@ -217,7 +217,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         this.addMessageHandler(
                 10, // "UNREGISTER"
                 (words)->{
-                    int courseNum = (int)words.get(0);
+                    int courseNum = parseInt(words.get(0).toString());
                     Course course = database.Courses().getCourse(courseNum);
                     try {
                         User user = database.Clients().get(this.clientId).getUser();
@@ -272,15 +272,15 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
     }
 
     private ResponseMessage error(int msg_opcode, String msg) { // ERROR OPCODE = 13
-        System.out.println("ERROR: " + msg); // TODO: COMMENT BEFORE SUBMITTING
+//        System.out.println("ERROR: " + msg); // TODO: COMMENT BEFORE SUBMITTING
         return respond(13, msg_opcode, "");
     }
 
-    public Message process(Message msg) {
+    public Message<?> process(Message<?> msg) {
         int opcode = msg.getOpcode();
-        List words = msg.getWords();
+        List<?> words = msg.getWords();
 
-        Function<List, Message<String>> func = this.getHandler(opcode); // Try getting the command by its opcode
+        Function<List<?>, Message<String>> func = this.getHandler(opcode); // Try getting the command by its opcode
 
         if (Objects.isNull(func))
             return error(opcode, "Handler function not found.");

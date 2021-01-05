@@ -4,16 +4,16 @@ import bgu.spl.net.api.Message;
 import bgu.spl.net.api.MessageEncoderDecoder;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message> {
+public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message<?>> {
     private byte[] bytes = new byte[1 << 10]; // start with 1k
     private int len = 0;
 
-//    private byte[] opcode_bytes = new byte[2]; // TOOD: is this needed?
     private short opcode = 0;
 
     private int zeros_counter = 0;
@@ -23,27 +23,27 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     private byte[] secondWord = new byte[1 << 10];
     private int second_len = 0;
 
-    private final Function<Byte, Message>[] decodeMessageByOpcode;
+    private final ArrayList<Function<Byte, Message<?>>> decodeMessageByOpcode;
 
 
     public MessageEncoderDecoderImpl() {
         // Setup message decoder functions:
-        this.decodeMessageByOpcode = new Function[11];
+        this.decodeMessageByOpcode = new ArrayList<>(11);
 
         for (int i = 0; i <= 2; i++)
-            this.decodeMessageByOpcode[i] = this::decodeTwoStringMessage;
+            this.decodeMessageByOpcode.set(i, this::decodeTwoStringMessage);
 
         for (int i = 4; i <= 9; i++)
-            this.decodeMessageByOpcode[i] = this::decodeOneIntegerMessage;
+            this.decodeMessageByOpcode.set(i, this::decodeOneIntegerMessage);
 
-        this.decodeMessageByOpcode[3] = this::decodeNoParameterMessage;
-        this.decodeMessageByOpcode[10] = this::decodeNoParameterMessage;
-        this.decodeMessageByOpcode[7] = this::decodeOneStringMessage;
+        this.decodeMessageByOpcode.set(3, this::decodeNoParameterMessage);
+        this.decodeMessageByOpcode.set(10, this::decodeNoParameterMessage);
+        this.decodeMessageByOpcode.set(7, this::decodeOneStringMessage);
     }
 
-    private Function<Byte, Message> getMessageDecoder(int opcode) {
+    private Function<Byte, Message<?>> getMessageDecoder(int opcode) {
         try {
-            return this.decodeMessageByOpcode[opcode - 1];
+            return this.decodeMessageByOpcode.get(opcode - 1);
         }
         catch (Exception e) {
             throw new IllegalArgumentException("Unknown opcode provided.");
@@ -66,7 +66,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         if (nextByte == '\0') {
             this.zeros_counter--;
             if (this.zeros_counter <= 0) {
-                Message message = new TwoStringsMessage(
+                Message<String> message = new TwoStringsMessage(
                         this.opcode,
                         new String(this.firstWord, 0, this.first_len, StandardCharsets.UTF_8),
                         new String(this.secondWord, 0, this.second_len, StandardCharsets.UTF_8)
@@ -102,7 +102,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
     private Message<String> decodeOneStringMessage(byte nextByte) {
         if (nextByte == '\0') {
-            Message message = new OneStringMessage(
+            Message<String> message = new OneStringMessage(
                     this.opcode,
                     new String(this.firstWord, 0, this.first_len, StandardCharsets.UTF_8)
             );
@@ -126,7 +126,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         return null;
     }
 
-    private Message decodeNoParameterMessage(byte nextByte) {
+    private Message<Integer> decodeNoParameterMessage(byte nextByte) {
         if (len == 2) {
             resetEncoderDecoder();
             return new OneIntegerMessage(this.opcode, (int) byteToShort(this.bytes));
@@ -136,15 +136,13 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     @Override
-    public Message decodeNextByte(byte nextByte) {
+    public Message<?> decodeNextByte(byte nextByte) {
         if (len == 0) { // First byte is 0 - ignored.
             this.len++;
         }
         else if (this.len == 1) { // First two bytes represent the opcode
             this.len++;
 
-            /*opcode_bytes[0] = 0; // TODO: delete if works
-            opcode_bytes[1] = nextByte;*/ // TODO: delete if works
             opcode = byteToShort(new byte[] {0, nextByte}); // Set opcode
 
             if (opcode == 4 /*LOGOUT*/ || opcode == 11 /*MYCOURSES*/) // Handle opcode-only messages
@@ -167,7 +165,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     }
 
     @Override
-    public byte[] encode(Message message) {
+    public byte[] encode(Message<?> message) {
         String reply_str = "";
         if (!Objects.isNull(message.getResponse()))
             reply_str = message.getResponse().toString();
