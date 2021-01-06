@@ -19,16 +19,15 @@ public class ReactorMain {
         int port = parseInt(args[0]);
         int threads = parseInt(args[1]);
 
-        try (Server<Message> server = new Reactor<Message>(
+        try (Server<Message<?>> server = new Reactor<>(
                 threads,
                 port,
                 BGRSProtocol::new,
                 MessageEncoderDecoderImpl::new
-            )) {
+        )) {
             server.serve(); // Start the server reactor...
         }
         catch (IOException e) {
-            // TODO
         }
     }
 }

@@ -21,10 +21,6 @@ public class Course {
     Courses courses;
 
     public Course(int courseNumber, int numOfMaxStudents, String name, List<Integer> kdam) {
-        // TODO: TEST
-        System.out.println("Creating Course: " + name + " (" + courseNumber + ")");
-        // TODO: TEST
-
         this.courses = Courses.getInstance();
         this.courseNumber = courseNumber;
         this.maxStudents = numOfMaxStudents;
