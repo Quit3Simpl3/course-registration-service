@@ -30,13 +30,8 @@ public class Database {
 	public synchronized void userLogin(String clientId, String username, String password) throws Exception {
 		User user = this.getUser(username);
 		User current_user = this.Clients().get(clientId).getUser();
-		if (!Objects.isNull(current_user)) /*{
-			if (current_user != user)*/
+		if (!Objects.isNull(current_user))
 				throw new Exception("Client already logged-in with a different user.");
-			/*else { // current_user == new_user
-				user.login(password);
-			}
-		}*/ // TODO: check if ACK when logging-in again with same user correctly
 		else { // Client isn't logged-in
 			if (!user.isLoggedIn()) { // Check if the user is already logged-in with a different client
 				user.login(password);
@@ -145,7 +140,6 @@ public class Database {
 			generateCoursesFromFile(coursesFilePath);
 		}
 		catch (FileNotFoundException e) {
-			System.out.println(e.getMessage());
 			return false;
 		}
 

@@ -43,12 +43,18 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message<
         this.decodeMessageByOpcode.set(7, this::decodeOneStringMessage);
     }
 
+    private Message<?> unknownOpcodeDecoder(byte nextByte) {
+        resetEncoderDecoder();
+        return new OneIntegerMessage(this.opcode, 13);
+    }
+
     private Function<Byte, Message<?>> getMessageDecoder(int opcode) {
         try {
             return this.decodeMessageByOpcode.get(opcode - 1);
         }
         catch (Exception e) {
-            throw new IllegalArgumentException("Unknown opcode provided.");
+            return this::unknownOpcodeDecoder;
+            // throw new IllegalArgumentException("Unknown opcode provided.");
         }
     }
 

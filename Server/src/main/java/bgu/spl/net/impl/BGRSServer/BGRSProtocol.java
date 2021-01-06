@@ -45,7 +45,6 @@ public class BGRSProtocol implements MessagingProtocol<Message<?>> {
             return this.database.Clients().get(this.clientId).getUser().isAdmin();
         }
         catch (NullPointerException e) {
-            System.out.println("Client is not logged-in.");
             return false;
         }
     }
@@ -175,7 +174,7 @@ public class BGRSProtocol implements MessagingProtocol<Message<?>> {
 
                         User student = database.getUser(username);
                         if (student.isAdmin())
-                            throw new IllegalArgumentException("Provided user is admin."); // TODO: is this needed?
+                            throw new IllegalArgumentException("Provided user is admin.");
 
                         List<Course> courses = student.getCourses();
                         List<Integer> courseNames = new ArrayList<>();
@@ -272,7 +271,7 @@ public class BGRSProtocol implements MessagingProtocol<Message<?>> {
     }
 
     private ResponseMessage error(int msg_opcode, String msg) { // ERROR OPCODE = 13
-//        System.out.println("ERROR: " + msg); // TODO: COMMENT BEFORE SUBMITTING
+//        System.out.println("ERROR: " + msg); // COMMENT BEFORE SUBMITTING
         return respond(13, msg_opcode, "");
     }
 

@@ -30,7 +30,6 @@ public class TPCMain {
             server.serve();
         }
         catch (IOException e) {
-            // TODO
         }
     }
 }
