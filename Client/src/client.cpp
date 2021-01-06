@@ -1,16 +1,10 @@
 #include <stdlib.h>
-#include "../include/connectionHandler.h"
-#include "../include/userMessage.h"
-#include "../include/serverMessage.h"
-#include "../src/connectionHandler.cpp"
-#include "../src/userMessage.cpp"
-#include "../src/serverMessage.cpp"
+#include "connectionHandler.h"
+#include "userMessage.h"
+#include "serverMessage.h"
 
 #include <thread>
 
-/**
-* This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
-*/
 int main (int argc, char *argv[]) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
@@ -25,22 +19,21 @@ int main (int argc, char *argv[]) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
-    bool* terminate= new bool;
-    bool* logOut= new bool;
-    *terminate = false;
-    *logOut = false;
-    userMessage userIn(&connectionHandler,terminate,logOut);
-    serverMessage serverIn(&connectionHandler,terminate,logOut);
+
+    bool terminate = false;
+    bool logOut = false;
+
+    userMessage userIn = userMessage(&connectionHandler, &terminate, &logOut);
+    serverMessage serverIn = serverMessage(&connectionHandler, &terminate, &logOut);
 
     thread user(&userMessage::run, &userIn);
     thread server(&serverMessage::run, &serverIn);
 
-    //sync because we dont want to lose data from server
+    // Sync because we don't want to lose data from server
     server.join();
     user.join();
 
+    connectionHandler.close();
 
-    delete terminate;
-    delete logOut;
     return 0;
 }
